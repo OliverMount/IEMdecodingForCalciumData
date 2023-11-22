@@ -56,4 +56,4 @@ This repository contains codes Python codes for decoding orientations from mouse
     └── task
 ```
 
-
+Note: Individual figures for each condition is stored inside the plots directory. Montage folder (that cotains sewed figure files) will be recrated only if the platform is Lixux (if montage is installed). 
