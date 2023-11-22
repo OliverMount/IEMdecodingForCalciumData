@@ -13,6 +13,7 @@ This repository contains codes Python codes for decoding orientations from mouse
 	The two levels of the data directory will look like this
 
 	```
+
 	├── passive
 	│   ├── PPC_135
 	│   ├── PPC_45
@@ -34,6 +35,7 @@ This repository contains codes Python codes for decoding orientations from mouse
 		├── V1_135
 		├── V1_45
 		└── V1_90
+
 	```
 3. Run the scripts.py it would create a decoding folder (this is the results folder) in the level as of the scripts folder. The structure  of the decoding folder would be the following
 
