@@ -1,12 +1,8 @@
 # IEM decoding For Calcium Data
 
-Inverted Encoding Model-based decoding for Mouse Calcium Imaging Data (V1 and PPC)
+This repository contains codes Python codes for decoding orientations from mouse V1 and PPC data.
 
-This repository contains codes Python codes for decoding orientations from mouse v1 and ppc data.
-
-
-Instruction for running the code
-
+### Instruction for running the code
 
 1. git clone the repository to a local folder in your computer
 
