@@ -29,12 +29,12 @@ This repository contains codes Python codes for decoding orientations from mouse
 	│   ├── task_V1_45.mat
 	│   └── task_V1_90.mat
 	└── task
-		├── PPC_135
-		├── PPC_45
-		├── PPC_90
-		├── V1_135
-		├── V1_45
-		└── V1_90
+	├── PPC_135
+	├── PPC_45
+	├── PPC_90
+	├── V1_135
+	├── V1_45
+	└── V1_90
 
 	```
 3. Run the scripts.py it would create a decoding folder (this is the results folder) in the level as of the scripts folder. The structure  of the decoding folder would be the following
