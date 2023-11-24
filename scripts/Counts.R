@@ -80,8 +80,7 @@ combined$PercentageNonTuned <- round((combined$NonTuned/(combined$Tuned+combined
 write.csv(combined,file=paste0(save_path,'combined.csv')) 
 
 
-# combining data for subtypes
-
+# combining data for subtypes 
 combined_subtypes<- data.frame(Condition=rep(NA,1), TunedTuned=rep(NA,1),
                                                     TunedNonTuned=rep(NA,1),
                                                     NonTunedTuned=rep(NA,1),
@@ -105,13 +104,7 @@ combined_subtypes$PercentageTunedNonTuned <- round((combined_subtypes$TunedNonTu
 combined_subtypes$PercentageNonTunedTuned <- round((combined_subtypes$NonTunedTuned/(combined_subtypes$NonTunedTuned+combined_subtypes$NonTunedNonTuned))*100,3)
 combined_subtypes$PercentageNoTunedNonTuned <- round((combined_subtypes$NonTunedNonTuned/(combined_subtypes$NonTunedTuned+combined_subtypes$NonTunedNonTuned))*100,3)
 
-
-
-
-write.csv(combined_subtypes,file=paste0(save_path,'combined_subtypes.csv')) 
-
-
-
+write.csv(combined_subtypes,file=paste0(save_path,'combined_subtypes.csv'))  
 
 ## plotting
 cus_cols <- c("#FF0000", "#0000FF", "#00FF00", "#FFA500", "#800080", "#FFFF00") 
@@ -391,5 +384,93 @@ for (condition in levels(df$Condition)) {
     cat("\n")
   }
 }
+
+
+############## Percentage tuned (for each decoding plot) ############## 
+# combining data for sub-types 
+
+percents=c(10,20,40,60,100)
+conds=c('V1 45','V1 90','V1 135','PPC 45','PPC 90','PPC 135')
+
+setwd('/media/olive/Research/oliver/pvals/')
+PercentageWise<- data.frame(Condition=rep(NA,1), 
+                               Percentage=rep(NA,1),
+                               Homocells=rep(NA,1),
+                               PercentageTuned=rep(NA,1),
+                               PercentageNonTuned=rep(NA,1)) 
+
+for (para in paradigm){
+  cd(para)
+  for (cond in conds){   # for each condition 
+    A<-readMat(paste0(cond,'.mat'))  
+    L<- length(A$homo) # No of animals 
+  
+      for (k in 1:L){  # for each animal
+        
+        # homo p-values
+        homo<- as.numeric(unlist(A$homo[[k]]))
+        hetero<- as.numeric(unlist(A$hetero[[k]]))
+        
+        # homo counts
+        homo_order<- order(homo)  # order the homo according to the p-value 
+         
+        temp<- data.frame(Condition=rep(,L), 
+                          Percentage=rep(NA,1),
+                          Homocells=rep(NA,1),
+                          PercentageTuned=rep(NA,1),
+                          PercentageNonTuned=rep(NA,1))
+        
+      for (percent in percents){    # for each percentage  
+        
+          # total number of cells within a given percentage
+          total_cells<-  as.integer(ceil((percent/100)*length(order(homo))))  # percentage of cells taken from homo 
+          
+          #  homo counts
+          homo_cells_percent <- sum(homo[order(homo)][1:total_cells] <= pval_threshold)*100/total_cells
+          hetero_cells_percent <- sum(hetero[order(homo)][1:total_cells] <= pval_threshold)*100/total_cells
+          
+          
+          PercentageWise$Condition
+          #  hetero counts
+          n_tuned_tuned <- sum(hetero[order(homo)][1:n_homo_tuned] <= pval_threshold)
+          n_tuned_nontuned <- sum(hetero[order(homo)][1:n_homo_tuned] > pval_threshold)
+          
+          n_nontuned_tuned <- sum(hetero[order(homo)][n_homo_tuned+1: (length(homo_order)-n_homo_tuned)] <= pval_threshold)
+          n_nontuned_nontuned <- sum(hetero[order(homo)][n_homo_tuned+1: (length(homo_order)-n_homo_tuned)] > pval_threshold)
+          
+          tuned_nontuned[k,1]<-n_homo_tuned
+          tuned_nontuned[k,2]<-n_homo_nontuned
+          
+        
+        
+      }
+      
+      
+      
+      
+      temp<- data.frame(Condition=rep(cond,L),
+                      Percentage=A$TunedTuned,
+                      PercentageTuned=A$TunedNonTuned,
+                      PercentageNonTuned=A$NonTunedTuned)
+    }
+    
+    
+    
+    
+    combined_subtypes<-rbind(combined_subtypes,temp) 
+  } 
+}
+
+combined_subtypes <-na.omit(combined_subtypes)
+combined_subtypes$PercentageTunedTuned <- round((combined_subtypes$TunedTuned/(combined_subtypes$TunedTuned+combined_subtypes$TunedNonTuned))*100,3)
+combined_subtypes$PercentageTunedNonTuned <- round((combined_subtypes$TunedNonTuned/(combined_subtypes$TunedTuned+combined_subtypes$TunedNonTuned))*100,3)
+
+combined_subtypes$PercentageNonTunedTuned <- round((combined_subtypes$NonTunedTuned/(combined_subtypes$NonTunedTuned+combined_subtypes$NonTunedNonTuned))*100,3)
+combined_subtypes$PercentageNoTunedNonTuned <- round((combined_subtypes$NonTunedNonTuned/(combined_subtypes$NonTunedTuned+combined_subtypes$NonTunedNonTuned))*100,3)
+
+
+
+
+write.csv(combined_subtypes,file=paste0(save_path,'combined_subtypes.csv')) 
 
 
