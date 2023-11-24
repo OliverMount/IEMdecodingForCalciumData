@@ -390,20 +390,25 @@ for (condition in levels(df$Condition)) {
 # combining data for sub-types 
 
 percents=c(10,20,40,60,100)
+Lp<-length(percents)
+
 conds=c('V1 45','V1 90','V1 135','PPC 45','PPC 90','PPC 135')
+Lconds<-length(conds)
 
 setwd('/media/olive/Research/oliver/pvals/')
-PercentageWise<- data.frame(Condition=rep(NA,1), 
+PercentageWise<- data.frame(   Paradigm =rep(NA,1),
+                               Condition=rep(NA,1), 
                                Percentage=rep(NA,1),
                                Homocells=rep(NA,1),
-                               PercentageTuned=rep(NA,1),
-                               PercentageNonTuned=rep(NA,1)) 
+                               Homo=rep(NA,1),    # All tuned cells
+                               Hetero=rep(NA,1))  # All tuned cells
 
 for (para in paradigm){
   cd(para)
   for (cond in conds){   # for each condition 
-    A<-readMat(paste0(cond,'.mat'))  
+    A<-readMat(paste0(str_replace(cond,' ','_'),'.mat'))  
     L<- length(A$homo) # No of animals 
+    Lconds<-length(conds) 
   
       for (k in 1:L){  # for each animal
         
@@ -412,65 +417,107 @@ for (para in paradigm){
         hetero<- as.numeric(unlist(A$hetero[[k]]))
         
         # homo counts
-        homo_order<- order(homo)  # order the homo according to the p-value 
-         
-        temp<- data.frame(Condition=rep(,L), 
-                          Percentage=rep(NA,1),
-                          Homocells=rep(NA,1),
-                          PercentageTuned=rep(NA,1),
-                          PercentageNonTuned=rep(NA,1))
+        homo_order<- order(homo)  # order the homo according to the p-value  
+
+        temp<- data.frame(Paradigm=rep(para,Lp),
+                          Condition=rep(cond,Lp), 
+                          Percentage=rep(NA,Lp),
+                          Homocells=rep(NA,Lp),
+                          Homo=rep(NA,Lp),
+                          Hetero=rep(NA,Lp)) 
         
-      for (percent in percents){    # for each percentage  
-        
-          # total number of cells within a given percentage
-          total_cells<-  as.integer(ceil((percent/100)*length(order(homo))))  # percentage of cells taken from homo 
+        idx=1
+        for (percent in percents){    # for each percentage
           
-          #  homo counts
-          homo_cells_percent <- sum(homo[order(homo)][1:total_cells] <= pval_threshold)*100/total_cells
-          hetero_cells_percent <- sum(hetero[order(homo)][1:total_cells] <= pval_threshold)*100/total_cells
+            temp[idx,3]<- percent
+           
           
+            # total number of cells within a given percentage
+            total_cells<-  as.integer(ceil((percent/100)*length(order(homo))))  # percentage of cells taken from homo 
+            
+            temp[idx,4]<- total_cells
+             
+            
+            #  homo counts
+            homo_tuned_cells <- sum(homo[order(homo)][1:total_cells] <= pval_threshold)*100/total_cells
+            hetero_tuned_cells <- sum(hetero[order(homo)][1:total_cells] <= pval_threshold)*100/total_cells
+            
+            temp[idx,5]<- homo_tuned_cells
+            temp[idx,6]<- hetero_tuned_cells
+            idx=idx+1
+             
+        }
           
-          PercentageWise$Condition
-          #  hetero counts
-          n_tuned_tuned <- sum(hetero[order(homo)][1:n_homo_tuned] <= pval_threshold)
-          n_tuned_nontuned <- sum(hetero[order(homo)][1:n_homo_tuned] > pval_threshold)
-          
-          n_nontuned_tuned <- sum(hetero[order(homo)][n_homo_tuned+1: (length(homo_order)-n_homo_tuned)] <= pval_threshold)
-          n_nontuned_nontuned <- sum(hetero[order(homo)][n_homo_tuned+1: (length(homo_order)-n_homo_tuned)] > pval_threshold)
-          
-          tuned_nontuned[k,1]<-n_homo_tuned
-          tuned_nontuned[k,2]<-n_homo_nontuned
-          
-        
-        
-      }
-      
-      
-      
-      
-      temp<- data.frame(Condition=rep(cond,L),
-                      Percentage=A$TunedTuned,
-                      PercentageTuned=A$TunedNonTuned,
-                      PercentageNonTuned=A$NonTunedTuned)
-    }
+          PercentageWise<- rbind(PercentageWise,temp)
+          rm(temp) 
     
-    
-    
-    
-    combined_subtypes<-rbind(combined_subtypes,temp) 
+    } 
   } 
 }
 
-combined_subtypes <-na.omit(combined_subtypes)
-combined_subtypes$PercentageTunedTuned <- round((combined_subtypes$TunedTuned/(combined_subtypes$TunedTuned+combined_subtypes$TunedNonTuned))*100,3)
-combined_subtypes$PercentageTunedNonTuned <- round((combined_subtypes$TunedNonTuned/(combined_subtypes$TunedTuned+combined_subtypes$TunedNonTuned))*100,3)
-
-combined_subtypes$PercentageNonTunedTuned <- round((combined_subtypes$NonTunedTuned/(combined_subtypes$NonTunedTuned+combined_subtypes$NonTunedNonTuned))*100,3)
-combined_subtypes$PercentageNoTunedNonTuned <- round((combined_subtypes$NonTunedNonTuned/(combined_subtypes$NonTunedTuned+combined_subtypes$NonTunedNonTuned))*100,3)
-
-
+PercentageWise <-na.omit(PercentageWise)
+PercentageWise$Percentage<- factor(PercentageWise$Percentage,levels=c(10,20,40,60,100),ordered = T) 
+PercentageWise$Condition<- factor(PercentageWise$Condition, 
+                                  levels = c("V1 45","V1 90","V1 135","PPC 45","PPC 90","PPC 135"),
+                                  ordered = TRUE)
+write.csv(PercentageWise,file=paste0(save_path,'PercentageWise.csv')) 
 
 
-write.csv(combined_subtypes,file=paste0(save_path,'combined_subtypes.csv')) 
 
+# plot of distribution of number of cells considered in each percentage
+
+cus_cols<-c('#FF0000','#0000FF','#00FF00','#800080','#FFA500')
+p <- ggplot(PercentageWise, 
+            aes(x = Percentage, y = Homocells, group =Percentage,fill=Percentage)) +
+  geom_boxplot(position = "dodge",outlier.color = "red",
+               outlier.shape = NA) + 
+  #geom_jitter(width=0.1,alpha=1,size=1,color="black",shape=21,fill="grey")+
+  #stat_summary(fun=mean, geom='point', shape=23, size=3,
+  #             color="black",fill="magenta",alpha=0.7)+
+  theme_classic()+
+  theme(legend.position = "right",
+        axis.ticks.length.x = unit(3,'mm'),
+        axis.ticks.length.y = unit(3,'mm'), 
+        axis.text = element_text(size=20),
+        axis.title.x = element_text(size=24),
+        axis.title.y = element_text(size=24),
+        plot.title = element_text(size=24,hjust = 0.5), 
+        legend.title = element_blank(), 
+        strip.text.x = element_text(size = 24))+ 
+  facet_wrap(~Condition, scales = "free_y") +
+  labs(x = "% of data used for decoding", y = "No. of cells") +
+  scale_fill_manual(values =cus_cols,guide='none')  
+
+
+# Print the plot
+print(p)  
+
+
+# For homo and hetero tuned cells within percentage of cells considered
+df<- melt(PercentageWise[c(1,2,3,5,6)])
+
+ 
+p <- ggplot(df, aes(x = variable, y = value, fill = Percentage)) +
+  geom_boxplot(position = "dodge",outlier.color = "red",
+               outlier.shape = NA) + 
+  #geom_jitter(width=0.1,alpha=1,size=1,color="black",shape=21,fill="grey")+
+  #stat_summary(fun=mean, geom='point', shape=23, size=3,
+  #             color="black",fill="magenta",alpha=0.7)+
+  theme_classic()+
+  theme(legend.position = "right",
+        axis.ticks.length.x = unit(3,'mm'),
+        axis.ticks.length.y = unit(3,'mm'), 
+        axis.text = element_text(size=20),
+        axis.title.x = element_text(size=24),
+        axis.title.y = element_text(size=24),
+        plot.title = element_text(size=24,hjust = 0.5), 
+        legend.title = element_blank(), 
+        strip.text.x = element_text(size = 24))+ 
+  facet_wrap(~Condition, scales = "free_y") +
+  labs(x = "Condition", y = "Percentage of Tuned Cells")  
+
+
+
+# Print the plot
+print(p) 
 
