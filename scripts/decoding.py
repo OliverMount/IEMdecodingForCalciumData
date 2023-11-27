@@ -101,10 +101,8 @@ nperm,tail,cluster_alpha=5000,1,0.05
 xmin=-0.5
 xmax=4
 
-ymin=-0.3
-ymax=0.7
-
-
+ymin=-0.05
+ymax=0.25 
 first_sig=0.24
 second_sig=0.23
 diff_sig=0.22
@@ -307,7 +305,50 @@ for folder in ROIs_hetero:  # for each folder
 	os.chdir(folder)
 	
 	for pp in percent_data: # for each p-value percentage
-	#for pp in percent_data[4:5]: # for checking
+	
+		if folder =='V1_45' and pp==10:
+			ymin=-0.05
+			ymax=0.25
+			first_sig=0.24
+			second_sig=0.23
+			diff_sig=0.22
+		elif folder=='V1_90' and pp==10:
+			ymin=-0.05
+			ymax=0.25
+			first_sig=0.39
+			second_sig=0.38
+			diff_sig=0.37
+		elif folder=='V1_135' and pp==10:
+			ymin=-0.05
+			ymax=0.25
+			first_sig=0.24
+			second_sig=0.23
+			diff_sig=0.22
+		elif folder =='PPC_45' and pp==10:
+			ymin=-0.05
+			ymax=0.25
+			first_sig=0.24
+			second_sig=0.23
+			diff_sig=0.22
+		elif folder=='PPC_90' and pp==10:
+			ymin=-0.05
+			ymax=0.25
+			first_sig=0.24
+			second_sig=0.23
+			diff_sig=0.22
+		elif folder=='PPC_135' and pp==10:
+			ymin=-0.05
+			ymax=0.25
+			first_sig=0.24
+			second_sig=0.23
+			diff_sig=0.22
+		else:
+			ymin=-0.05
+			ymax=0.25
+			first_sig=0.24
+			second_sig=0.23
+			diff_sig=0.22
+	
 		os.chdir(str(pp))
 		
 		A=np.load('slopes.npy')
@@ -315,6 +356,13 @@ for folder in ROIs_hetero:  # for each folder
 		sig1=A[:,:,0]  # homo  # no. mouse X no. time points X (homo or hetero)
 		sig2=A[:,:,1]  # hetero  
 		
+		if pp==10 or pp==20:
+			sig1[:,15:]=replace_consecutive_above_threshold(sig1[:,15:], threshold=0.3)
+			sig2[:,15:]=replace_consecutive_above_threshold(sig2[:,15:], threshold=0.3)
+			
+			sig1[:,15:]=replace_consecutive_below_threshold(sig1[:,15:], threshold=-0.3)
+			sig2[:,15:]=replace_consecutive_below_threshold(sig2[:,15:], threshold=-0.3)
+			
 		
 		fig, ax = plt.subplots(1,1,figsize=(7,7))	
 		# plot the mean and error bar
@@ -386,7 +434,7 @@ for folder in ROIs_hetero:  # for each folder
 		
 		
 		ax.set_xticks([0, 1,2,3,4,5]) 
-		ax.set_yticks([0, 0.1,0.2]) 
+		ax.set_yticks(np.arange(-0.2,ymax,0.1)) 
 		ax.set_xlim(xmin, xmax) 
 		ax.axvline(x=0,color='k',linestyle='--',lw=1)  
 		ax.axhline(y=0,color='k',linestyle='--',lw=1)  
@@ -428,115 +476,8 @@ if is_montage_installed():
 	fname='montages/Task_PPC_135.png' 
 	status=os.system('montage task_PPC_135_10.png task_PPC_135_20.png task_PPC_135_40.png task_PPC_135_60.png  task_PPC_135_100.png   -tile 5x1  -geometry +1+1 ' + fname)
 else:
-	print_status('Montage NOT installed in your computer. Skipping...')
-
+	print_status('Montage NOT installed in your computer. Skipping...') 
 #########################################################################################
 ############################  ANALYSIS FOR PASSIVE DATA #################################
 #########################################################################################
-
-""" 
-paradigm='passive'
-
-PPC_passive=['3L.mat','3R.mat','YLbc.mat','YLcj.mat','YLck.mat','YLcl.mat','YLcm.mat']
-V1_passive=['1L.mat','1R.mat','2L.mat','Ylce.mat','Ylcf.mat','Ylcg.mat']
-
-# Decoding for passivve  conditions  
-for roi in ROIs_hetero:   # For each heterogeneous condition
-	os.chdir(data_path_passive)
-	print_status('Dealing with ROI: ' + roi)
-	
-	os.chdir(roi)
-	
-	ani_list=os.listdir()
-	print(ani_list)
-	noa=len(ani_list)
-	
-	print_status('No. of animals in ' + roi + ' is ' + str(noa)) 
-	
-	# load the pvalues for all animals 
-	B=loadmat(os.path.join(pval_path,paradigm+'_'+roi+'.mat'))
-	Pval_homo = [element[0][0][0] for i in range(B['pVal_homo'].shape[0]) if np.size(B['pVal_homo'][i][0]) != 0 for element in B['pVal_homo'][i]]
-	Pval_hetero= [element[0][0][0] for i in range(B['pVal_hetero'].shape[0]) if np.size(B['pVal_hetero'][i][0]) != 0 for element in B['pVal_hetero'][i]]
-	
-	if roi.startswith('V1'):
-		list_for_sorting=V1_passive
-	else:
-		list_for_sorting=PPC_passive
-		
-	ani_list=[[file for file in ani_list if file.lower().endswith(suffix.lower())] for suffix in list_for_sorting]
-	ani_list= [ani[0] for ani in ani_list]
-	
-	st_roi = time.time()
-	for p in range(len(ani_list)):   # For each animal
-		
-		print_status('Dealing with the animal ' + ani_list[p])
-		
-		A=loadmat(ani_list[p])	 # Load the data
-		
-		# homo and hetero data
-		homo_data=A['sample_data_homo']	   #orig.data:	 trials X units X time-pts
-		homo_data=homo_data.transpose(1,0,2)   #for decoding:  units X trials X time-pts  
-		
-		hetero_data=A['sample_data_hetero']
-		hetero_data =hetero_data.transpose(1,0,2)  
-		
-		# homo and hetero data labels
-		homo_labels=np.squeeze(A['dirIdx_homo'])  
-		hetero_labels=np.squeeze(A['dirIdx_hetero'])  
-		
-		del A
-		
-		# Shuffle labels and data before decoding 
-		idx=np.random.permutation(len(homo_labels))
-		homo_labels=homo_labels[idx]
-		homo_data=homo_data[:,idx,:]
-		
-		idx=np.random.permutation(len(hetero_labels))
-		hetero_labels=hetero_labels[idx]
-		hetero_data=hetero_data[:,idx,:]
-		
-		print_status('Homo. shape is ' + str(homo_data.shape))
-		print_status('Hetero. shape is ' + str(hetero_data.shape))   
-		
-		# arranging according to the p-value (units X trials X time-pts )
-		homo_indices=np.argsort(Pval_homo[p])
-		homo_data=homo_data[homo_indices,:,:]  # arranging data accroding to sorted pvalue 
-	  
-		#hetero_indices=np.argsort(Pval_hetero[p])
-		hetero_data=hetero_data[homo_indices,:,:]  # arranging hetero data accroding to sorted pvalue of homo
-		
-		for pp in percent_data: 
-			p_homo = int(np.ceil((pp/100)*homo_data.shape[0])) 
-			homo_data_p=homo_data[:p_homo,:,:]
-
-			p_hetero = int(np.ceil((pp/100)*hetero_data.shape[0])) 
-			hetero_data_p=hetero_data[:p_hetero,:,:]   
-
-			print_status('Homo. shape before decoding is ' + str(homo_data_p.shape))
-			print_status('Hetero. shape before decoding is ' + str(hetero_data_p.shape))   
-		
-			# Parallel decoding begings here
-			st = time.time() 
-			A=run_parallel_the_time(homo_data_p,hetero_data_p,homo_labels,hetero_labels,nt)  # (Homo result, Hetero. result)
-			ed = time.time()
-			
-			elapsed_time = ed - st
-			print_status('Execution time: ' + str(elapsed_time) + ' for animal ' + str(p))   
-			 
-			print('Shape of A is ', A.shape)
-			print_status('Saving the tuning curves') 
-			path_name=os.path.join(task_save_path,roi,str(pp))
-			create_dir(path_name)
-			fname=path_name+'/Mouse'+str(p+1) + '.npy'
-			print(fname)
-					
-			np.save(fname,np.squeeze(A))
-			del A 
-			
-			print_status('Done with ' + str(p+1) + '/' + str(noa) + ' for the percentage '+ str(pp),'') 
-		
-			print_status('Done with ' + str(p+1) + '/' + str(noa),'') 
-			ed_roi = time.time()
-			elapsed_time = ed_roi - st_roi
-			print_status('Execution time for the whole roi is ' + str(elapsed_time))   
-"""
+ 

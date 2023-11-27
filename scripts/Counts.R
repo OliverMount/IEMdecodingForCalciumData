@@ -346,13 +346,13 @@ p <- ggplot(df, aes(x = variable, y = value, fill = Percent)) +
         legend.title = element_blank(), 
         strip.text.x = element_text(size = 24))+ 
   facet_wrap(~Condition, scales = "free_y") +
-  labs(x = "Condition", y = "Average slope")  +
-  stat_compare_means(method = "t.test", comparisons = list(c("10", "20"), c("20", "40"), c("40", "60"), c("60", "100")),
-                     label = "p.format", label.y = 0.1)  # Adjust label.y for proper positioning
+  labs(x = "Condition", y = "Average slope") +
+  scale_y_continuous(breaks = seq(0,0.28,0.05),limits = c(-0.001,0.28),
+                     expand = c(0,0))  #+
+  #stat_compare_means(method = "t.test", comparisons = list(c("10", "20"), c("20", "40"), c("40", "60"), c("60", "100")),
+  #                   label = "p.format", label.y = 0.1)  # Adjust label.y for proper positioning 
 
-
- 
-
+  
 # Print the plot
 print(p) 
 
@@ -460,8 +460,7 @@ PercentageWise$Percentage<- factor(PercentageWise$Percentage,levels=c(10,20,40,6
 PercentageWise$Condition<- factor(PercentageWise$Condition, 
                                   levels = c("V1 45","V1 90","V1 135","PPC 45","PPC 90","PPC 135"),
                                   ordered = TRUE)
-write.csv(PercentageWise,file=paste0(save_path,'PercentageWise.csv')) 
-
+write.csv(PercentageWise,file=paste0(save_path,'PercentageWise.csv'))  
 
 
 # plot of distribution of number of cells considered in each percentage
@@ -514,9 +513,7 @@ p <- ggplot(df, aes(x = variable, y = value, fill = Percentage)) +
         legend.title = element_blank(), 
         strip.text.x = element_text(size = 24))+ 
   facet_wrap(~Condition, scales = "free_y") +
-  labs(x = "Condition", y = "Percentage of Tuned Cells")  
-
-
+  labs(x = "Condition", y = "Percentage of Tuned Cells")   
 
 # Print the plot
 print(p) 

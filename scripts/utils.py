@@ -13,10 +13,87 @@ from scipy import interpolate
 from scipy.io import loadmat,savemat   
 from scipy.ndimage import gaussian_filter1d
 from scipy.stats import zscore 
- 
+
 angles=np.arange(22.5,360,45) # Stimulus angles 
 center_around=5  # Center the tuning curves around this angle 
-  
+
+
+def replace_consecutive_above_threshold(array, threshold=0.3):
+    result = array.copy()
+
+    for i in range(array.shape[0]):  # Iterate over rows
+        j = 0
+        while j < array.shape[1]:
+            if array[i, j] > threshold:
+                # Find the consecutive region above the threshold
+                start_idx = j
+                while j < array.shape[1] and array[i, j] > threshold:
+                    j += 1
+                end_idx = j - 1
+
+                # Replace the consecutive values with the average of points before and after the region
+                prev_value = array[i, start_idx-1] if start_idx > 0 else array[i, start_idx]
+                next_value = array[i, end_idx+1] if end_idx < array.shape[1] - 1 else array[i, end_idx]
+
+                avg_value = (prev_value + next_value) / 2
+
+                # Update the consecutive region with the average value
+                result[i, start_idx:end_idx+1] = avg_value
+            else:
+                j += 1
+
+    return result
+
+
+def replace_consecutive_below_threshold(array, threshold=-0.3):
+    result = array.copy()
+
+    for i in range(array.shape[0]):  # Iterate over rows
+        j = 0
+        while j < array.shape[1]:
+            if array[i, j] < threshold:
+                # Find the consecutive region below the threshold
+                start_idx = j
+                while j < array.shape[1] and array[i, j] < threshold:
+                    j += 1
+                end_idx = j - 1
+
+                # Replace the consecutive values with the average of points before and after the region
+                prev_value = array[i, start_idx-1] if start_idx > 0 else array[i, start_idx]
+                next_value = array[i, end_idx+1] if end_idx < array.shape[1] - 1 else array[i, end_idx]
+
+                avg_value = (prev_value + next_value) / 2
+
+                # Update the consecutive region with the average value
+                result[i, start_idx:end_idx+1] = avg_value
+            else:
+                j += 1
+
+    return result
+
+
+
+def replace_above_threshold(array, threshold=0.3):
+	result = array.copy()
+	for i in range(array.shape[0]):  # Iterate over animals
+		for j in range(1, array.shape[1] - 1):  # Iterate over columns, excluding the first and last columns
+			if array[i, j] > threshold:
+				# Replace the value with the average of the previous and next time points in the row
+				result[i, j] = (array[i, j-1] + array[i, j+1]) / 2
+	
+	return result
+	
+def replace_below_threshold(array, threshold=-0.3):
+	result = array.copy()
+	for i in range(array.shape[0]):  # Iterate over animals
+		for j in range(1, array.shape[1] - 1):  # Iterate over columns, excluding the first and last columns
+			if array[i, j] < threshold:
+				# Replace the value with the average of the previous and next time points in the row
+				result[i, j] = (array[i, j-1] + array[i, j+1]) / 2
+	
+	return result
+
+
 
 class InvertedEncoding:
 	"""
@@ -198,20 +275,20 @@ class InvertedEncoding:
 			raise NotImplementedError(self.sys_type + ' not implemented yet')
 
 def create_dir(p): 
-    """
-    Creates a directory given a path 'p'
-    Examples:
-    ---------
-    create_dir('test') -> Creates a folder test in the present working directory
-    create_dir('/home/user/test/) -> Creates a folder test in home/user/ directory
-    """
-    isExist = os.path.exists(p)  
-    if not isExist:  
-        os.makedirs(p)
-        print('The directory ' +  p   + ' is created!')
-    else:
-        print('The directory ' +  p   + ' already exists. Nothing created!')
-    return p
+	"""
+	Creates a directory given a path 'p'
+	Examples:
+	---------
+	create_dir('test') -> Creates a folder test in the present working directory
+	create_dir('/home/user/test/) -> Creates a folder test in home/user/ directory
+	"""
+	isExist = os.path.exists(p)  
+	if not isExist:  
+		os.makedirs(p)
+		print('The directory ' +  p   + ' is created!')
+	else:
+		print('The directory ' +  p   + ' already exists. Nothing created!')
+	return p
 
 
 def roll_all(X,y,ref): 
@@ -244,7 +321,7 @@ def roll_all(X,y,ref):
 		raise NotImplementedError('-- roll_all is not implemented for more than 3D :-( ')
 		
 	return res 
-        
+		
 def run_parallel_the_time(D1,D2,d1,d2,nt):
  
 	n_cpu = mp.cpu_count()  # Total number of CPU
@@ -280,7 +357,7 @@ def process_time_step(Xtra,Xte,ytra,yte):
 	# centering the tuning curve based on the presented orientation
 	ypred=roll_all(predicted,yte,center_around)
 	ypred=np.mean(ypred,1) # mean across trials of zero-centered) tuning curvesv (hetero case)   
-    
+	
 	#print(cv_res_final.shape)
 	#print(ypred[:,np.newaxis].shape) 
 	res=np.concatenate((cv_res_final,ypred[:,np.newaxis]),axis=-1)  
@@ -291,8 +368,8 @@ def process_cv(Xtrain,ytrain,Xtest,ytest):
  
 	model=InvertedEncoding(angles,p=6, ref=center_around)   
 	model.fit(Xtrain, ytrain,sys_type="under")  
-    
-	model.predict(Xtest)    
+	
+	model.predict(Xtest)	
 	predicted=model.predicted_values 
  
 	y_pred=roll_all(predicted,ytest,center_around) 
@@ -300,13 +377,13 @@ def process_cv(Xtrain,ytrain,Xtest,ytest):
 	return y_pred  
 
 def print_status(msg,kind='short',line=50):
-    
-    if kind=='short':
-        print('++ '+msg)
-    else:
-        print('++ '+line*'-')
-        print('++ '+msg)
-        print('++ '+line*'-')
+	
+	if kind=='short':
+		print('++ '+msg)
+	else:
+		print('++ '+line*'-')
+		print('++ '+msg)
+		print('++ '+line*'-')
 
 def avg_across_zero_centered_tcs(data,shift): 
 	print_status('Averaging equi-distant orientations')	 
@@ -360,8 +437,8 @@ def esti_slope(angles,y,intercept=False,standardise=False):
 
 
 def is_montage_installed():
-    try:
-        subprocess.run(["montage", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        return True
-    except subprocess.CalledProcessError:
-        return False
+	try:
+		subprocess.run(["montage", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		return True
+	except subprocess.CalledProcessError:
+		return False
