@@ -356,6 +356,44 @@ p <- ggplot(df, aes(x = variable, y = value, fill = Percent)) +
 # Print the plot
 print(p) 
 
+test<- df %>%
+  group_by(Condition,Percent,variable) %>%
+  summarise(ME= mean(value),SE=sd(value)/sqrt(n()))
+
+p <- ggplot(test, aes(x = variable, y = ME, fill = Percent)) +
+  #geom_line(aes(group= Percent))+
+  geom_errorbar(aes(ymin = ME -SE , ymax = ME + SE),
+                position = position_dodge(width = 0.75),
+                width = 0.15,  # Adjust the width based on your preference
+                color = "black",
+                size = 1.5) +
+  #geom_jitter(width=0.1,alpha=1,size=1,color="black",shape=21,fill="grey")+
+  #stat_summary(fun=mean, geom='point', shape=23, size=3,
+  #             color="black",fill="magenta",alpha=0.7)+
+  theme_classic()+
+  theme(legend.position = "right",
+        axis.ticks.length.x = unit(3,'mm'),
+        axis.ticks.length.y = unit(3,'mm'), 
+        axis.text = element_text(size=20),
+        axis.title.x = element_text(size=24),
+        axis.title.y = element_text(size=24),
+        plot.title = element_text(size=24,hjust = 0.5), 
+        legend.title = element_blank(), 
+        strip.text.x = element_text(size = 24))+ 
+  facet_wrap(~Condition, scales = "free_y") +
+  labs(x = "Condition", y = "Average slope") +
+  scale_y_continuous(breaks = seq(0,0.28,0.05),limits = c(-0.001,0.28),
+                     expand = c(0,0)) +
+  scale_fill_manual(values = c("magenta", "green", "blue","red","black"))#+
+#stat_compare_means(method = "t.test", comparisons = list(c("10", "20"), c("20", "40"), c("40", "60"), c("60", "100")),
+#                   label = "p.format", label.y = 0.1)  # Adjust label.y for proper positioning 
+
+
+# Print the plot
+print(p) 
+ 
+
+
 # List of pairs for t-tests
 pairs <- list(c(10, 20), c(20, 40), c(40, 60), c(60, 100),c(10,60),c(10,100))
 
