@@ -22,7 +22,7 @@ nos<-8 # number of directions
 paradigm<-'task'
 setwd(file.path(base_path,paradigm))
 
-conds=list.files()
+conds=list.files(pattern = '.mat')
 
  # run this only one time
 
@@ -74,7 +74,4 @@ for (cond in conds){   # for each condition
   row.names(df)<- 1:nrow(df)
   write.csv(df,file=file.path(base_path,paradigm,paste0(cond_name,'_prefer.csv')))
   
-}
-
-
-
+} 
