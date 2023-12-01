@@ -56,8 +56,7 @@ for (cond in conds){   # for each condition
                        Pvalue=ho_p,
                        Preference=homo) 
       
-      df<-rbind(df,temp) 
-      
+      df<-rbind(df,temp)  
       
       # for hetero
       temp<-data.frame(Sub=rep(paste0("Animal.",k),Lf),

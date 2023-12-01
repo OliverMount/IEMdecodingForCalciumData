@@ -297,7 +297,7 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 				
 				# Parallel decoding begings here
 				st = time.time() 
-				A=run_parallel_the_pop_decoding(homo_data_p,hetero_data_p,PrefDirInfo,nt)  # (Homo result, Hetero. result)
+				A=run_parallel_the_pop_decoding(homo_data_p,hetero_data_p,homo_labels,hetero_labels,PrefDirInfo,nt)  # (Homo result, Hetero. result)
 				ed = time.time()
 					
 				elapsed_time = ed - st
