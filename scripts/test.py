@@ -1,4 +1,4 @@
-tr=40
+tr=80
 
 ho=homo_data_p[:,:,tr]
 he=hetero_data_p[:,:,tr]
@@ -20,7 +20,6 @@ def run_parallel_the_pop_decoding(ho,he,ho_la,he_la,Info,nt):
 	return np.stack(results,axis=-1)  # neurons X presented stimuls X (mean, std) X time    
 
  
-
 def pop_decode_at_a_single_timept(ho,he,ho_la,he_la,Info):
 	
 	"""
@@ -48,7 +47,7 @@ def pop_decode_at_a_single_timept(ho,he,ho_la,he_la,Info):
 		he_subset_1=he[:,hetero_trials]
 		
 		# For each tuning neuron (subset the data based on neurons)
-		for l in range(1,ns): 
+		for l in range(1,ns+1): 
 			idx_homo=np.where(Info['Pref.Homo']==l)[0]
 			idx_hetero=np.where(Info['Pref.Hetero']==l)[0] 
 			
@@ -77,3 +76,9 @@ def pop_decode_at_a_single_timept(ho,he,ho_la,he_la,Info):
             
     return np.stack((res_ho_mean,res_he_mean,res_ho_std,res_he_std),axis=-1) 
 	
+
+
+plt.imshow(res_ho_mean)
+plt.plot(res_ho_mean)
+plt.plot(res_he_mean)
+plt.plot(res_he_mean[:,7])
