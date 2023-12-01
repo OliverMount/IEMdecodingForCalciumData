@@ -1,9 +1,10 @@
-# Population decoding 
+# Population decoding  of calcium imaging data
 
 import sys
 import os
  
 import numpy as np 
+import pandas as pd
 import multiprocessing as mp  # For parallel processing
  
 import re	
@@ -116,8 +117,10 @@ for k in ROIs_hetero:
 	create_dir(os.path.join(decoding_res_data_path,'task',k))
 	create_dir(os.path.join(decoding_res_data_path,'passive',k)) 
  
-# Percentage of cells to use for decoding (it includes both tuned and untuned neurons)
-#percent_data=[10,20,40,60,100]	
+# Percentage of cells to use for decoding (tuned + % of untuned cells)
+percent_data=[0,10,20,40,60,100]	
+
+
 #########################################################################################
 ############################  ANALYSIS FOR TASK DATA #####################################
 #########################################################################################
@@ -140,16 +143,17 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 	
 	print_status('No. of animals in ' + roi + ' is ' + str(noa)) 
 	
-	# load the pvalues for an animals 
-	B=loadmat(os.path.join(pval_path,paradigm+'_'+roi+'.mat'))
-	Pval_homo = [element[0][0][0] for i in range(B['pVal_homo'].shape[0]) if np.size(B['pVal_homo'][i][0]) != 0 for element in B['pVal_homo'][i]]
-	Pval_hetero= [element[0][0][0] for i in range(B['pVal_hetero'].shape[0]) if np.size(B['pVal_hetero'][i][0]) != 0 for element in B['pVal_hetero'][i]]
+	# load the neuron preferences and pvalue for all animals 
+	B = pd.read_csv(os.path.join(pval_pref_path, paradigm,roi+'_prefer.csv'))
+	 
+	#C=loadmat(os.path.join(pval_path,paradigm+'_'+roi+'.mat'))
+	#Pval_homo = [element[0][0][0] for i in range(C['pVal_homo'].shape[0]) if np.size(C['pVal_homo'][i][0]) != 0 for element in C['pVal_homo'][i]]
+	#Pval_hetero= [element[0][0][0] for i in range(C['pVal_hetero'].shape[0]) if np.size(C['pVal_hetero'][i][0]) != 0 for element in C['pVal_hetero'][i]]
 	
 	if roi.startswith('V1'):
 		list_for_sorting=V1_task
 	else:
-		list_for_sorting=PPC_task
-		
+		list_for_sorting=PPC_task 
 	
 	ani_list=[[file for file in ani_list if file.lower().endswith(suffix.lower())] for suffix in list_for_sorting]
 	ani_list= [ani[0] for ani in ani_list]
@@ -157,6 +161,52 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 	st_roi = time.time()
 	for p in range(len(ani_list)):   # For each animal
 	#for p in range(1):	
+		# load  the pure tuning for homo
+		df_homo=B[(B['Sub']=='Animal.'+str(p+1))  & (B['Group'] =='homo')]
+		df_hetero=B[(B['Sub']=='Animal.'+str(p+1))  & (B['Group'] =='hetero')] 
+		
+		# resetting the index is needed after subsetting the data
+		df_homo.reset_index(drop=True, inplace=True)
+		df_hetero.reset_index(drop=True, inplace=True)  # reset the indices
+		
+		# to get a data frame that is tuned in both the condition
+		# finding indices that match both conditions
+		final=pd.merge(df_homo[df_homo['Pvalue'] <= 0.05], df_hetero[df_hetero['Pvalue'] <= 0.05], left_index=True, right_index=True)
+		#print(final.shape)
+		TunedIndices=final.index.to_numpy() 
+		
+		pref_df = final[['Preference_x','Preference_y']]
+		pref_df = pref_df.copy()  # to avoid the copy warnings
+		pref_df['Neuron'] = final.index.to_list()
+		pref_df.rename(columns={'Preference_x': 'Pref.Homo', 'Preference_y': 'Pref.Hetero'}, inplace=True)
+		pref_df.reset_index(drop=True, inplace=True)
+		
+		#df_homo_final=df_homo.iloc[indices]
+		#df_hetero_final=df_hetero.iloc[indices] 
+		
+		#df_homo_final.reset_index(drop=True, inplace=True)
+		#df_hetero_final.reset_index(drop=True, inplace=True)  
+		
+		# This is for data sorting according to P-value
+		idx_homo=np.argsort(df_homo['Pvalue'])  # homo in the ascending order
+		
+		df_homo_sorted=df_homo.loc[idx_homo]
+		df_hetero_sorted=df_hetero.loc[idx_homo]
+		
+		
+		
+		#Ltuned=len(np.where(df_homo['Pvalue']<=pval_thresold)[0])
+		#df_homo_final.shape[0]
+		
+		#idx_hetero=np.argsort(df_hetero['Pvalue'])  # hetero in the ascending order
+		#Ltuned=len(np.where(df_hetero['Pvalue']<=pval_thresold)[0])
+		
+		#df_homo_final=df_homo.iloc[idx_homo[:Ltuned]]
+		#df_heter_final=df_hetero.iloc[idx_homo[:Ltuned]]
+		
+		#df=df_homo[df_homo['Pvalue']<=pval_thresold]
+		#df_homo=B[ (B['Sub']=='Animal.'+str(p+1)) & (B['Group'] =='homo') & (B['Pvalue']<= pval_thresold)]
+		#df_hetero=B[ (B['Sub']=='Animal.'+str(p+1)) & (B['Group'] =='homo') & (B['Pvalue']<= pval_thresold) & ()]
 		
 		print_status('Dealing with the animal ' + ani_list[p])
 		
@@ -184,53 +234,89 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 		hetero_labels=hetero_labels[idx]
 		hetero_data=hetero_data[:,idx,:]
 		
+		print_status('Before subsetting the data')
 		print_status('Homo. shape is ' + str(homo_data.shape))
 		print_status('Hetero. shape is ' + str(hetero_data.shape))   
 		
-		# arranging according to the p-value (units X trials X time-pts )
-		homo_indices=np.argsort(Pval_homo[p])
-		homo_data=homo_data[homo_indices,:,:]  # arranging homo data accroding to sorted pvalue 
-		hetero_data=hetero_data[homo_indices,:,:]  # arranging hetero data accroding to sorted pvalue
+		# arranging according to the indices (p-value <= 0.05) (units X trials X time-pts )
+		#homo_indices=np.argsort(Pval_homo[p])
+		#homo_data=homo_data[NeuronIndices,:,:]  # arranging homo data accroding to sorted pvalue 
+		#hetero_data=hetero_data[NeuronIndices,:,:]  # arranging hetero data accroding to sorted pvalue 
+		
+		#print_status('After subsetting the data')
+		#print_status('Homo. shape is ' + str(homo_data.shape))
+		#print_status('Hetero. shape is ' + str(hetero_data.shape))   
+		#print_status('After subsetting data is used for decoding')
 		
 		for pp in percent_data: 
 		
 			path_name=os.path.join(decoding_res_data_path,paradigm,roi,str(pp))
 			create_dir(path_name)
-			fname=path_name+'/Mouse'+str(p+1) + '.npy'
+			fname=path_name+'/Mouse'+str(p+1) + '.npy'  
 			
-			if not os.path.exists(fname): 
-			
-				p_homo = int(np.ceil((pp/100)*homo_data.shape[0])) 
-				homo_data_p=homo_data[:p_homo,:,:]
+			if not os.path.exists(fname):
 
-				p_hetero = int(np.ceil((pp/100)*hetero_data.shape[0])) 
-				hetero_data_p=hetero_data[:p_hetero,:,:]   
-
+				# Get the indices of the other neurons and use them for decoding
+				# Only homo data is enough to sort out the neurons
+				# as we always choose homotuned neurons and choose the same in the 
+				# hetero condition
+				if pp!=0:  # Other than tuned on both homo and hetero 
+					 
+					#hetero_data_p=hetero_data[:p_hetero,:,:] 
+					# first remove the tuned tuned one from the original df
+					df_homo_sorted_pp=df_homo_sorted.drop(TunedIndices) 
+					df_hetero_sorted_pp=df_hetero_sorted.drop(TunedIndices)
+					
+					nper_cells = int(np.ceil((pp/100)*df_homo_sorted_pp.shape[0])) # get the number of cells 
+					
+					additional_neurons=df_homo_sorted_pp[:nper_cells].index.to_numpy()
+					Ladd=len(additional_neurons)
+					
+					# Neurons used for decoding
+					NeuronIndices=np.concatenate((TunedIndices,additional_neurons))  
+					
+					update_df= pd.DataFrame()
+					update_df['Pref.Homo']=df_homo_sorted_pp[:nper_cells]['Preference']
+					update_df['Pref.Hetero']=df_hetero_sorted_pp[:nper_cells]['Preference']
+					
+					update_df['Neuron']=df_homo_sorted_pp[:nper_cells].index
+					
+					# update the  pref_df (to include the new additional neurons)
+					PrefDirInfo=pd.concat([pref_df, update_df], ignore_index=True)
+					
+				else:
+					NeuronIndices=TunedIndices
+					PrefDirInfo=pd.DataFrame()
+					PrefDirInfo=pref_df
+				
+				homo_data_p=homo_data[NeuronIndices,:,:]  # arranging homo data accroding to sorted pvalue 
+				hetero_data_p=hetero_data[NeuronIndices,:,:]  # arranging hetero data accroding to sorted pvalue 
+				
 				print_status('Homo. shape before decoding is ' + str(homo_data_p.shape))
 				print_status('Hetero. shape before decoding is ' + str(hetero_data_p.shape))   
-			
+				
 				# Parallel decoding begings here
 				st = time.time() 
-				A=run_parallel_the_time(homo_data_p,hetero_data_p,homo_labels,hetero_labels,nt)  # (Homo result, Hetero. result)
+				A=run_parallel_the_pop_decoding(homo_data_p,hetero_data_p,PrefDirInfo,nt)  # (Homo result, Hetero. result)
 				ed = time.time()
-				
+					
 				elapsed_time = ed - st
 				print_status('Execution time: ' + str(elapsed_time) + ' for animal ' + str(p))   
-				 
+					 
 				print('Shape of A is ', A.shape)
 				print_status('Saving the tuning curves') 
 				path_name=os.path.join(decoding_res_data_path,paradigm,roi,str(pp))
 				create_dir(path_name)
 				fname=path_name+'/Mouse'+str(p+1) + '.npy'
 				print(fname)
-						
+							
 				np.save(fname,np.squeeze(A))
 				del A 
-				
+					
 				print_status('Done with ' + str(p+1) + '/' + str(noa) + ' for the percentage '+ str(pp),'') 
-				
+					
 				ed_roi = time.time()
 				elapsed_time = ed_roi - st_roi
 				print_status('Execution time for the whole roi is ' + str(elapsed_time))   
-			else:
-				print_status('Already done with ' + str(p+1) + '/' + str(noa) + ' for the percentage '+ str(pp),'')
+		else:
+			print_status('Already done with ' + str(p+1) + '/' + str(noa) + ' for the percentage '+ str(pp),'') 
