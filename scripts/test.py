@@ -22,6 +22,25 @@ def pop_decode_at_a_single_timept(ho,he,ho_la,he_la,Info):
 	(population curve construction)
 	"""
 	
+    # In a given trial a stimuls is presented 
 	
 	for k in range(1,ns+1):  # Given a stimulus (directions are coded from 1 to 8)
+        
+        # presented trials
+        homo_trials=np.where(ho_la==k)[0]  # cannot be empty
+        hetero_trials=np.where(he_la==k)[0] # cannot be empty
+    
+        # subset the data based on trials
+        ho_subset_1=ho[:,homo_trials]
+        h2_subset_1=he[:,hetero_trials]
+        
+        # For each tuning neuron (subset the data based on neurons)
+        for l in range(1,ns): 
+            idx_homo=np.where(Info['Pref.Homo']==l)[0]
+            idx_hetero=np.where(Info['Pref.Hetero']==l)[0] 
+            
+            # subsetted data based on the tuned neurons
+            ho_subset=homo_data[idx_homo,:]
+            he_subset=homo_data[idx_homo,:]
+    
 		pass 
