@@ -6,6 +6,9 @@ ho_la=homo_labels
 he_la=hetero_labels 
 Info=PrefDirInfo
 
+temp=run_parallel_the_pop_decoding(homo_data_p,hetero_data_p,homo_labels,hetero_labels,PrefDirInfo,nt)
+# temp shape is 8 8 4 120
+
 def run_parallel_the_pop_decoding(ho,he,ho_la,he_la,Info,nt):
 	
 	n_cpu = mp.cpu_count()  # Total number of CPU
@@ -17,7 +20,7 @@ def run_parallel_the_pop_decoding(ho,he,ho_la,he_la,Info,nt):
 
 	results = [r.get() for r in time_step_results]   
  
-	return np.stack(results,axis=-1)  # neurons X presented stimuls X (mean, std) X time    
+	return np.stack(results,axis=-1)  # neurons X presented stimuls X (mean, std) X time	
 
  
 def pop_decode_at_a_single_timept(ho,he,ho_la,he_la,Info):
@@ -73,8 +76,8 @@ def pop_decode_at_a_single_timept(ho,he,ho_la,he_la,Info):
 			res_ho_std[l-1,k-1]=ho_std
 			res_he_std[l-1,k-1]=he_std
 			
-            
-    return np.stack((res_ho_mean,res_he_mean,res_ho_std,res_he_std),axis=-1) 
+			
+	return np.stack((res_ho_mean,res_he_mean,res_ho_std,res_he_std),axis=-1) 
 	
 
 
