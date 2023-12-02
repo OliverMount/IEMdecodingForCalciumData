@@ -31,9 +31,9 @@ def pop_decode_at_a_single_timept(ho,he,ho_la,he_la,Info):
 	
 	# initialization for mean and standard devivation
 	res_ho_mean=np.zeros((ns,ns))
-	res_he_mean=np.zeros_like(res_ho) 
-	res_ho_std=np.zeros_like(res_ho)
-	res_he_std=np.zeros_like(res_ho)
+	res_he_mean=np.zeros_like(res_ho_mean) 
+	res_ho_std=np.zeros_like(res_ho_mean)
+	res_he_std=np.zeros_like(res_ho_mean)
 	
 	# In a given trial a stimuls is presented  
 	for k in range(1,ns+1):  # Given a stimulus (directions are coded from 1 to 8)
