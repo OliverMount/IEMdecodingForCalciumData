@@ -21,6 +21,8 @@ import matplotlib.pyplot as plt
 matplotlib.rcParams['axes.linewidth'] = 2
 
 # Load local modules
+scripts_dir='/media/olive/Research/oliver/IEMdecodingForCalciumData/scripts/'
+os.chdir(scripts_dir)
 sys.path.append(os.getcwd())
 from utils import *	 # it imports the decoder as well
 
@@ -232,7 +234,8 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 	st_roi = time.time()
 	for p in range(len(ani_list)):   # For each animal
 	#for p in range(1):	
-		# load  the pure tuning for homo
+		# load that animal data in homo and hetero group  
+        # This is not sorted yet using p-value
 		df_homo=B[(B['Sub']=='Animal.'+str(p+1))  & (B['Group'] =='homo')]
 		df_hetero=B[(B['Sub']=='Animal.'+str(p+1))  & (B['Group'] =='hetero')] 
 		
@@ -263,9 +266,7 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 		
 		df_homo_sorted=df_homo.loc[idx_homo]
 		df_hetero_sorted=df_hetero.loc[idx_homo]
-		
-		
-		
+		 
 		#Ltuned=len(np.where(df_homo['Pvalue']<=pval_thresold)[0])
 		#df_homo_final.shape[0]
 		
@@ -297,6 +298,7 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 		del A
 		
 		# Shuffle labels and data before decoding 
+        # Not necessary for population decoding
 		idx=np.random.permutation(len(homo_labels))
 		homo_labels=homo_labels[idx]
 		homo_data=homo_data[:,idx,:]
@@ -391,3 +393,59 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 				print_status('Execution time for the whole roi is ' + str(elapsed_time))   
 		else:
 			print_status('Already done with ' + str(p+1) + '/' + str(noa) + ' for the percentage '+ str(pp),'') 
+
+# Centering and computing slopes
+
+
+# Slope dynamics computation and storing the results
+for roi in ROIs_hetero:   # For each condition 
+	
+	for pp in percent_data: # For each percentage of data 
+		
+		os.chdir(os.path.join(decoding_res_data_path, paradigm))
+		print_status('Computing slopes for  ROI' + roi +' for the percentage  ',str(pp)) 
+	
+		os.chdir(os.path.join(roi,str(pp)))
+
+		ani_list=os.listdir()
+		noa=len(ani_list)
+
+		print_status('No. of animals in ' + roi + ' is ' + str(noa))
+
+		st_roi = time.time()
+
+		slopes=np.zeros((noa,nt,2))  # 2 conditions
+
+		for p in range(len(ani_list)):   # For each animal
+		
+			save_dir=os.path.join(decoding_res_slopes_path,'task',roi,str(pp))
+			create_dir(save_dir) 
+			fname=os.path.join(save_dir,'slopes.npy')
+			
+			if not os.path.exists(fname): 
+
+				A=np.load(ani_list[p+1])  # Load the tuning curve data 
+				
+				B=avg_across_zero_centered_tcs(A,shift=wrap_around)
+
+				if Gaussian_smoothening_needed:
+					print_status('Gaussian smoothening desired!') 
+					S=Gaussian_smoothener(B,sig=sig,trun=trun ,ts=ts) 
+				else:
+					print_status('NO Gaussian smoothening desired!') 
+					S=B  
+
+				## Estimate the slope 
+				# Homo-case
+				print_status('Computing slopes..') 
+				for time_pts in range(nt): 
+					slopes[p,time_pts,0]=esti_slope(slope_angles,S[:,time_pts,0],intercept=True, standardise=False) 
+
+				# Hetero-case 
+				for time_pts in range(nt): 
+					slopes[p,time_pts,1]=esti_slope(slope_angles,S[:,time_pts,1],intercept=True, standardise=False)   
+				 
+				np.save(fname,slopes)
+			else:
+				print_status('Already done with slope computations')
+

@@ -52,8 +52,10 @@ def pop_decode_at_a_single_timept(ho,he,ho_la,he_la,Info):
 		# For each tuning neuron (subset the data based on neurons)
 		for l in range(1,ns+1): 
 			idx_homo=np.where(Info['Pref.Homo']==l)[0]
+            #idx_homo=np.array(Info[Info['Pref.Homo']==l]['Neuron'])
 			idx_hetero=np.where(Info['Pref.Hetero']==l)[0] 
-			
+			#idx_hetero=np.array(Info[Info['Pref.Hetero']==l]['Neuron'])
+            
 			# subsetted data based on the tuned neurons (if they exists)
 			if len(idx_homo)!=0:
 				ho_subset2=ho_subset_1[idx_homo,:]
