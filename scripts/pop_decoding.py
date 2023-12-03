@@ -396,7 +396,7 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 
 # Centering and computing slopes
 
-
+""" 
 # Slope dynamics computation and storing the results
 for roi in ROIs_hetero:   # For each condition 
 	
@@ -448,4 +448,4 @@ for roi in ROIs_hetero:   # For each condition
 				np.save(fname,slopes)
 			else:
 				print_status('Already done with slope computations')
-
+"""
