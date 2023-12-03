@@ -74,8 +74,7 @@ def pop_decode_at_a_single_timept(ho,he,ho_la,he_la,Info):
 			res_he_mean[l-1,k-1]=he_mean
 
 			res_ho_std[l-1,k-1]=ho_std
-			res_he_std[l-1,k-1]=he_std
-			
+			res_he_std[l-1,k-1]=he_std 
 			
 	return np.stack((res_ho_mean,res_he_mean,res_ho_std,res_he_std),axis=-1) 
 	
