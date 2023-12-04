@@ -82,13 +82,13 @@ def pop_decode_at_a_single_timept(ho,he,ho_la,he_la,Info):
 	
 
 
-def get_tuning_curve(data,labels,dur_from=0,dur_to=120): 
+def get_tuning_curve(data,labels,dur_from=40,dur_to=120): 
     return np.array([np.mean(data[labels==k,dur_from:dur_to]) for k in range(1,ns+1)])
      
 def get_preference(data,labels,dur_from=40,dur_to=120):
     
-    tc=get_tuning_curve(data,labels,dur_from=0,dur_to=120)
-    return np.where(tc==np.max(tc))[0]+1
+    tc=get_tuning_curve(data,labels,dur_from=dur_from,dur_to=dur_to)
+    return np.where(tc==np.max(tc))[0]+1  # index from 1 to 8 
 
 
 plt.imshow(res_ho_mean)
@@ -96,9 +96,9 @@ plt.plot(res_ho_mean)
 plt.plot(res_he_mean)
 plt.plot(res_he_mean[:,7])
 
-idx=6
+idx=0
 plt.plot(get_tuning_curve(homo_data_p[idx,:,:],homo_labels))
-print("Preffered  homo: ", get_preference(homo_data_p[idx,:,:],homo_labels ))
+print("Preffered  homo: ", get_preference(homo_data_p[idx,:,:],homo_labels )[0])
  
 plt.plot(get_tuning_curve(hetero_data_p[idx,:,:],hetero_labels))
 print("Preffered hetero: ", get_preference(hetero_data_p[idx,:,:],hetero_labels))

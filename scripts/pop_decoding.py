@@ -235,17 +235,17 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 	for p in range(len(ani_list)):   # For each animal
 	#for p in range(1):	
 		# load that animal data in homo and hetero group  
-        # This is not sorted yet using p-value
+		# This is not sorted yet using p-value
 		df_homo=B[(B['Sub']=='Animal.'+str(p+1))  & (B['Group'] =='homo')]
 		df_hetero=B[(B['Sub']=='Animal.'+str(p+1))  & (B['Group'] =='hetero')] 
 		
-        # resetting the index is needed after subsetting the data
+		# resetting the index is needed after subsetting the data
 		df_homo.reset_index(drop=True, inplace=True)
 		df_hetero.reset_index(drop=True, inplace=True)  # reset the indices
-         
-        # arrange accoring to the p-value first
-        idx_homo=np.argsort(df_homo['Pvalue'])
-        df_homo_sorted=df_homo.loc[idx_homo]
+		 
+		# arrange accoring to the p-value first
+		idx_homo=np.argsort(df_homo['Pvalue'])
+		df_homo_sorted=df_homo.loc[idx_homo]
 		df_hetero_sorted=df_hetero.loc[idx_homo] 
 		 
 		# to get a data frame that is tuned in both the condition
@@ -254,6 +254,8 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 		#print(final.shape)
 		TunedIndices=final.index.to_numpy() 
 		
+		
+		# pref_df in only for tuned-tuned
 		pref_df = final[['Preference_x','Preference_y']]
 		pref_df = pref_df.copy()  # to avoid the copy warnings
 		pref_df['Neuron'] = final.index.to_list()
@@ -269,7 +271,7 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 		# This is for data sorting according to P-value
 		#idx_homo=np.argsort(df_homo['Pvalue'])  # homo in the ascending order
 		
-        # not subsetting (just arranging according to the p-value)
+		# not subsetting (just arranging according to the p-value)
 		#df_homo_sorted=df_homo.loc[idx_homo]
 		#df_hetero_sorted=df_hetero.loc[idx_homo]
 		 
@@ -304,7 +306,7 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 		del A
 		
 		# Shuffle labels and data before decoding 
-        # Not necessary for population decoding
+		# Not necessary for population decoding
 		idx=np.random.permutation(len(homo_labels))
 		homo_labels=homo_labels[idx]
 		homo_data=homo_data[:,idx,:]
@@ -318,8 +320,8 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 		#print_status('Hetero. shape is ' + str(hetero_data.shape))   
 		
 		# arranging according to the p value arrangement of homo as before 
-		homo_data=homo_data[idx_homo,:,:]  # arranging homo data accroding to sorted pvalue 
-		hetero_data=hetero_data[idx_homo,:,:]  # arranging hetero data accroding to sorted pvalue 
+		# homo_data=homo_data[idx_homo,:,:]  # arranging homo data accroding to sorted pvalue 
+		# hetero_data=hetero_data[idx_homo,:,:]  # arranging hetero data accroding to sorted pvalue 
 		
 		#print_status('After subsetting the data')
 		#print_status('Homo. shape is ' + str(homo_data.shape))
@@ -345,10 +347,11 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 					df_homo_sorted_pp=df_homo_sorted.drop(TunedIndices) 
 					df_hetero_sorted_pp=df_hetero_sorted.drop(TunedIndices)
 					
+                    # additional neurons
 					nper_cells = int(np.ceil((pp/100)*df_homo_sorted_pp.shape[0])) # get the number of cells 
 					
 					additional_neurons=df_homo_sorted_pp[:nper_cells].index.to_numpy()
-					Ladd=len(additional_neurons)
+					 
 					
 					# Neurons used for decoding
 					NeuronIndices=np.concatenate((TunedIndices,additional_neurons))  
@@ -373,6 +376,13 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 				print_status('Homo. shape before decoding is ' + str(homo_data_p.shape))
 				print_status('Hetero. shape before decoding is ' + str(hetero_data_p.shape))   
 				
+                
+                # updating preference direction
+                
+                for neu_idx in range(homo_data.shape[0]): 
+                    PrefDirInfo['Pref.Homo'][neu_idx]=get_preference(homo_data_p[neu_idx,:,:],homo_labels)[0]               
+                    PrefDirInfo['Pref.Hetero'][neu_idx]=get_preference(hetero_data_p[neu_idx,:,:],hetero_labels)[0]
+                
 				# Parallel decoding begings here
 				st = time.time() 
 				A=run_parallel_the_pop_decoding(homo_data_p,hetero_data_p,homo_labels,hetero_labels,PrefDirInfo,nt)  # (Homo result, Hetero. result)
