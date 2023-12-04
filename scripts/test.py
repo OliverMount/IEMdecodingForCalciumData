@@ -97,16 +97,34 @@ plt.plot(res_he_mean)
 plt.plot(res_he_mean[:,7])
 
 
-plt.imshow(A[:,:,0,110])
+plt.imshow(A[:,:,0,70])
 plt.imshow(A[:,:,1,70])
 
 test=A[:,:,0,70] 
-plt.plot(test)
+plt.plot(test[:,7])
 
 
-test=A[:,:,1,70].T 
+
+test=A[:,:,0,90] 
+plt.plot(test) 
 for k in range(test.shape[0]):
     test[:,k]=test[:,k]/max(test[:,k])
+plt.plot(test) 
+
+
+np.roll(test[:,6],-2)
+
+
+def rotate_all(test): 
+    for k in range(test.shape[0]):
+        test[:,k]=np.roll(test[:,k],center_around-1-k)
+    return test
+
+test=A[:,:,0,70].T 
+for k in range(test.shape[0]):
+    test[:,k]=test[:,k]/max(test[:,k])
+    print(test[:,k])
+    
 plt.plot(test) 
  
 lines=plt.plot(test) 
