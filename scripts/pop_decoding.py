@@ -239,13 +239,18 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 		df_homo=B[(B['Sub']=='Animal.'+str(p+1))  & (B['Group'] =='homo')]
 		df_hetero=B[(B['Sub']=='Animal.'+str(p+1))  & (B['Group'] =='hetero')] 
 		
-		# resetting the index is needed after subsetting the data
+        # resetting the index is needed after subsetting the data
 		df_homo.reset_index(drop=True, inplace=True)
 		df_hetero.reset_index(drop=True, inplace=True)  # reset the indices
-		
+         
+        # arrange accoring to the p-value first
+        idx_homo=np.argsort(df_homo['Pvalue'])
+        df_homo_sorted=df_homo.loc[idx_homo]
+		df_hetero_sorted=df_hetero.loc[idx_homo] 
+		 
 		# to get a data frame that is tuned in both the condition
 		# finding indices that match both conditions
-		final=pd.merge(df_homo[df_homo['Pvalue'] <= 0.05], df_hetero[df_hetero['Pvalue'] <= 0.05], left_index=True, right_index=True)
+		final=pd.merge(df_homo_sorted[df_homo_sorted['Pvalue'] <= 0.05], df_hetero_sorted[df_hetero_sorted['Pvalue'] <= 0.05], left_index=True, right_index=True)
 		#print(final.shape)
 		TunedIndices=final.index.to_numpy() 
 		
@@ -262,10 +267,11 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 		#df_hetero_final.reset_index(drop=True, inplace=True)  
 		
 		# This is for data sorting according to P-value
-		idx_homo=np.argsort(df_homo['Pvalue'])  # homo in the ascending order
+		#idx_homo=np.argsort(df_homo['Pvalue'])  # homo in the ascending order
 		
-		df_homo_sorted=df_homo.loc[idx_homo]
-		df_hetero_sorted=df_hetero.loc[idx_homo]
+        # not subsetting (just arranging according to the p-value)
+		#df_homo_sorted=df_homo.loc[idx_homo]
+		#df_hetero_sorted=df_hetero.loc[idx_homo]
 		 
 		#Ltuned=len(np.where(df_homo['Pvalue']<=pval_thresold)[0])
 		#df_homo_final.shape[0]
@@ -307,14 +313,13 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 		hetero_labels=hetero_labels[idx]
 		hetero_data=hetero_data[:,idx,:]
 		
-		print_status('Before subsetting the data')
-		print_status('Homo. shape is ' + str(homo_data.shape))
-		print_status('Hetero. shape is ' + str(hetero_data.shape))   
+		#print_status('Before subsetting the data')
+		#print_status('Homo. shape is ' + str(homo_data.shape))
+		#print_status('Hetero. shape is ' + str(hetero_data.shape))   
 		
-		# arranging according to the indices (p-value <= 0.05) (units X trials X time-pts )
-		#homo_indices=np.argsort(Pval_homo[p])
-		#homo_data=homo_data[NeuronIndices,:,:]  # arranging homo data accroding to sorted pvalue 
-		#hetero_data=hetero_data[NeuronIndices,:,:]  # arranging hetero data accroding to sorted pvalue 
+		# arranging according to the p value arrangement of homo as before 
+		homo_data=homo_data[idx_homo,:,:]  # arranging homo data accroding to sorted pvalue 
+		hetero_data=hetero_data[idx_homo,:,:]  # arranging hetero data accroding to sorted pvalue 
 		
 		#print_status('After subsetting the data')
 		#print_status('Homo. shape is ' + str(homo_data.shape))

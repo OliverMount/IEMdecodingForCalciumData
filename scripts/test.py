@@ -96,11 +96,9 @@ plt.plot(res_ho_mean)
 plt.plot(res_he_mean)
 plt.plot(res_he_mean[:,7])
 
-idx=7
-plt.plot(get_tuning_curve(homo_data_p[idx,:,:],homo_labels))
-print("Preffered : ", get_preference(homo_data_p[idx,:,:],homo_labels ))
-
-
 idx=6
+plt.plot(get_tuning_curve(homo_data_p[idx,:,:],homo_labels))
+print("Preffered  homo: ", get_preference(homo_data_p[idx,:,:],homo_labels ))
+ 
 plt.plot(get_tuning_curve(hetero_data_p[idx,:,:],hetero_labels))
-print("Preffered : ", get_preference(hetero_data_p[idx,:,:],hetero_labels))
+print("Preffered hetero: ", get_preference(hetero_data_p[idx,:,:],hetero_labels))
