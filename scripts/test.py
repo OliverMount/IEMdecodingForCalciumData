@@ -96,6 +96,29 @@ plt.plot(res_ho_mean)
 plt.plot(res_he_mean)
 plt.plot(res_he_mean[:,7])
 
+
+plt.imshow(A[:,:,0,110])
+plt.imshow(A[:,:,1,70])
+
+test=A[:,:,0,70] 
+plt.plot(test)
+
+
+test=A[:,:,1,70].T 
+for k in range(test.shape[0]):
+    test[:,k]=test[:,k]/max(test[:,k])
+plt.plot(test) 
+ 
+lines=plt.plot(test) 
+ 
+
+hex_colors = [line.get_color() for line in lines]
+
+color_names = [colors.to_rgba_array(hex_color)[0].name for hex_color in hex_colors]
+
+# Print the order of color names
+print("Order of colors:", color_names)
+
 idx=0
 plt.plot(get_tuning_curve(homo_data_p[idx,:,:],homo_labels))
 print("Preffered  homo: ", get_preference(homo_data_p[idx,:,:],homo_labels )[0])

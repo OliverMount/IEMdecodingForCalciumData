@@ -494,14 +494,14 @@ def pop_decode_at_a_single_timept(ho,he,ho_la,he_la,Info):
 			# subsetted data based on the tuned neurons (if they exists)
 			if len(idx_homo)!=0:
 				ho_subset2=ho_subset_1[idx_homo,:]
-				ho_mean=np.mean(ho_subset2.flatten())
+				ho_mean=np.mean(ho_subset2.flatten()) # mean across trials
 				ho_std=np.std(ho_subset2.flatten())
 			else: # if neuron group does not exist
 				ho_mean=0
 				ho_std=0
 			if len(idx_hetero)!=0:
 				he_subset2=he_subset_1[idx_hetero,:]
-				he_mean=np.mean(he_subset2.flatten())
+				he_mean=np.mean(he_subset2.flatten())  # mean across trials
 				he_std=np.std(he_subset2.flatten())
 			else:
 				he_mean=0

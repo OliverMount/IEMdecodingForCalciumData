@@ -347,7 +347,7 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 					df_homo_sorted_pp=df_homo_sorted.drop(TunedIndices) 
 					df_hetero_sorted_pp=df_hetero_sorted.drop(TunedIndices)
 					
-                    # additional neurons
+					# additional neurons
 					nper_cells = int(np.ceil((pp/100)*df_homo_sorted_pp.shape[0])) # get the number of cells 
 					
 					additional_neurons=df_homo_sorted_pp[:nper_cells].index.to_numpy()
@@ -376,13 +376,12 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 				print_status('Homo. shape before decoding is ' + str(homo_data_p.shape))
 				print_status('Hetero. shape before decoding is ' + str(hetero_data_p.shape))   
 				
-                
-                # updating preference direction
-                
-                for neu_idx in range(homo_data.shape[0]): 
-                    PrefDirInfo['Pref.Homo'][neu_idx]=get_preference(homo_data_p[neu_idx,:,:],homo_labels)[0]               
-                    PrefDirInfo['Pref.Hetero'][neu_idx]=get_preference(hetero_data_p[neu_idx,:,:],hetero_labels)[0]
-                
+				
+				# updating preference direction 
+				for neu_idx in range(homo_data_p.shape[0]): 
+					PrefDirInfo['Pref.Homo'][neu_idx]=get_preference(homo_data_p[neu_idx,:,:],homo_labels)[0]			   
+					PrefDirInfo['Pref.Hetero'][neu_idx]=get_preference(hetero_data_p[neu_idx,:,:],hetero_labels)[0]
+				
 				# Parallel decoding begings here
 				st = time.time() 
 				A=run_parallel_the_pop_decoding(homo_data_p,hetero_data_p,homo_labels,hetero_labels,PrefDirInfo,nt)  # (Homo result, Hetero. result)
