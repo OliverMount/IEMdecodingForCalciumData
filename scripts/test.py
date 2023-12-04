@@ -119,7 +119,7 @@ np.roll(test[:,6],-2)
 def rotate_all(a):  
     res=np.zeros_like(a)
     for k in range(a.shape[0]):
-        res[:,k]=np.roll(a[:,k],center_around-1-k)
+        res[:,k]=np.roll(a[:,k],wrap_around-1-k)
     return res
 
 a=rotate_all(test)

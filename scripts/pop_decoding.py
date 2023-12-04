@@ -70,77 +70,7 @@ decoding_res_slopes_path=os.path.join(decoding_res_path ,'slopes')
 task_save_path=os.path.join(decoding_res_data_path,'task')
 passive_save_path=os.path.join(decoding_res_data_path,'passive')
 
-
-
-def run_parallel_the_pop_decoding(ho,he,ho_la,he_la,Info,nt):
-	
-	n_cpu = mp.cpu_count()  # Total number of CPU
-	pool = mp.Pool(n_cpu) 
-	
-	time_step_results = [pool.apply_async(pop_decode_at_a_single_timept,args=(ho[:,:,tr],he[:,:,tr],ho_la,he_la,Info)) for tr in range(nt)]   
-	pool.close()
-	pool.join()
-
-	results = [r.get() for r in time_step_results]   
  
-	return np.stack(results,axis=-1)  # neurons X presented stimuls X (mean, std) X time	
-
- 
-def pop_decode_at_a_single_timept(ho,he,ho_la,he_la,Info):
-	
-	"""
-	Population decoding of neural data at single time point for all stimulus values
-	
-	Given a stimulus, what is the response of neurons that prefers different directions
-	(population curve construction)
-	"""
-	
-	# initialization for mean and standard devivation
-	res_ho_mean=np.zeros((ns,ns))
-	res_he_mean=np.zeros_like(res_ho_mean) 
-	res_ho_std=np.zeros_like(res_ho_mean)
-	res_he_std=np.zeros_like(res_ho_mean)
-	
-	# In a given trial a stimuls is presented  
-	for k in range(1,ns+1):  # Given a stimulus (directions are coded from 1 to 8)
-		
-		# presented trials
-		homo_trials=np.where(ho_la==k)[0]  # cannot be empty
-		hetero_trials=np.where(he_la==k)[0] # cannot be empty
-	
-		# subset the data based on trials
-		ho_subset_1=ho[:,homo_trials]
-		he_subset_1=he[:,hetero_trials]
-		
-		# For each tuning neuron (subset the data based on neurons)
-		for l in range(1,ns+1): 
-			idx_homo=np.where(Info['Pref.Homo']==l)[0]
-			idx_hetero=np.where(Info['Pref.Hetero']==l)[0] 
-			
-			# subsetted data based on the tuned neurons (if they exists)
-			if len(idx_homo)!=0:
-				ho_subset2=ho_subset_1[idx_homo,:]
-				ho_mean=np.mean(ho_subset2.flatten())
-				ho_std=np.std(ho_subset2.flatten())
-			else: # if neuron group does not exist
-				ho_mean=0
-				ho_std=0
-			if len(idx_hetero)!=0:
-				he_subset2=he_subset_1[idx_hetero,:]
-				he_mean=np.mean(he_subset2.flatten())
-				he_std=np.std(he_subset2.flatten())
-			else:
-				he_mean=0
-				he_std=0
-				 
-			res_ho_mean[l-1,k-1]=ho_mean
-			res_he_mean[l-1,k-1]=he_mean
-
-			res_ho_std[l-1,k-1]=ho_std
-			res_he_std[l-1,k-1]=he_std 
-			
-	return np.stack((res_ho_mean,res_he_mean,res_ho_std,res_he_std),axis=-1) 
-	
   
 # Adjustable parameter settings for decoding  
 fs=20	 # sampling frequency 
@@ -152,9 +82,7 @@ time_values=np.arange(analyse_time[0],analyse_time[1],ts)
 nt=len(time_values)
 
 angles=np.arange(22.5,360,45) # Stimulus angles
-ns=len(angles)   # no. of stimulus values
-center_around=5  # Center the tuning curves around this angle 
-  
+ns=len(angles)   # no. of stimulus values 
 # Parameters for slope computation
 tt=np.arange(-1,5,ts)
 trun=2
@@ -191,17 +119,7 @@ for k in ROIs_hetero:
 	create_dir(os.path.join(decoding_res_data_path,'passive',k)) 
  
 # Percentage of cells to use for decoding (tuned + % of untuned cells)
-percent_data=[0,10,20,40,60,100]	
-
-def get_tuning_curve(data,labels,dur_from=40,dur_to=120): 
-    return np.array([np.mean(data[labels==k,dur_from:dur_to]) for k in range(1,ns+1)])
-     
-def get_preference(data,labels,dur_from=40,dur_to=120):
-    
-    tc=get_tuning_curve(data,labels,dur_from=dur_from,dur_to=dur_to)
-    return np.where(tc==np.max(tc))[0]+1  # index from 1 to 8 
-
-
+percent_data=[0,10,20,40,60,100]	 
 #########################################################################################
 ############################  ANALYSIS FOR TASK DATA #####################################
 #########################################################################################
@@ -383,9 +301,8 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 				
 				print_status('Homo. shape before decoding is ' + str(homo_data_p.shape))
 				print_status('Hetero. shape before decoding is ' + str(hetero_data_p.shape))   
-				
-				
-				# updating preference direction 
+ 
+				# preference direction computation from data 
 				for neu_idx in range(homo_data_p.shape[0]): 
 					PrefDirInfo['Pref.Homo'][neu_idx]=get_preference(homo_data_p[neu_idx,:,:],homo_labels)[0]			   
 					PrefDirInfo['Pref.Hetero'][neu_idx]=get_preference(hetero_data_p[neu_idx,:,:],hetero_labels)[0]
@@ -416,9 +333,8 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 		else:
 			print_status('Already done with ' + str(p+1) + '/' + str(noa) + ' for the percentage '+ str(pp),'') 
 
-# Centering and computing slopes
-
-"""
+# Centering and computing slopes 
+ 
 # Slope dynamics computation and storing the results
 for roi in ROIs_hetero:   # For each condition  
 	for pp in percent_data: # For each percentage of data 
@@ -445,16 +361,17 @@ for roi in ROIs_hetero:   # For each condition
 			
 			if not os.path.exists(fname): 
 
-				A=np.load(ani_list[p+1])  # Load the tuning curve data 
-				
+				A=np.load(ani_list[p])  # Load the tuning curve data  
 				B=zero_center_the_tcs(A,shift=wrap_around)
+				C=B.transpose((0,2,1))
+				D=avg_across_zero_centered_tcs(C, shift=wrap_around)
 
 				if Gaussian_smoothening_needed:
 					print_status('Gaussian smoothening desired!') 
-					S=Gaussian_smoothener(B,sig=sig,trun=trun ,ts=ts) 
+					S=Gaussian_smoothener(D,sig=sig,trun=trun ,ts=ts) 
 				else:
 					print_status('NO Gaussian smoothening desired!') 
-					S=B  
+					S=D  
 
 				## Estimate the slope 
 				# Homo-case
@@ -466,7 +383,217 @@ for roi in ROIs_hetero:   # For each condition
 				for time_pts in range(nt): 
 					slopes[p,time_pts,1]=esti_slope(slope_angles,S[:,time_pts,1],intercept=True, standardise=False)   
 				 
-				np.save(fname,slopes)
+				
 			else:
-				print_status('Already done with slope computations')
+				print_status('Already done with slope computations') 
+				
+		np.save(fname,slopes) 
+		
+
+		
+plots_data_dir=decoding_res_fig_path
+
+os.chdir(os.path.join(decoding_res_slopes_path,paradigm))
+
+flist=os.listdir()
+
+for folder in ROIs_hetero:  # for each folder
+#for folder in ROIs_hetero[1:2]:  # for checking
+	os.chdir(os.path.join(decoding_res_slopes_path,paradigm))
+	os.chdir(folder)
+	
+	for pp in percent_data: # for each p-value percentage
+	
+		if folder =='V1_45' and pp==10:
+			ymin=-0.05
+			ymax=0.25
+			first_sig=0.24
+			second_sig=0.23
+			diff_sig=0.22
+		elif folder=='V1_90' and pp==10:
+			ymin=-0.05
+			ymax=0.25
+			first_sig=0.39
+			second_sig=0.38
+			diff_sig=0.37
+		elif folder=='V1_135' and pp==10:
+			ymin=-0.05
+			ymax=0.25
+			first_sig=0.24
+			second_sig=0.23
+			diff_sig=0.22
+		elif folder =='PPC_45' and pp==10:
+			ymin=-0.05
+			ymax=0.25
+			first_sig=0.24
+			second_sig=0.23
+			diff_sig=0.22
+		elif folder=='PPC_90' and pp==10:
+			ymin=-0.05
+			ymax=0.25
+			first_sig=0.24
+			second_sig=0.23
+			diff_sig=0.22
+		elif folder=='PPC_135' and pp==10:
+			ymin=-0.05
+			ymax=0.25
+			first_sig=0.24
+			second_sig=0.23
+			diff_sig=0.22
+		else:
+			ymin=-0.05
+			ymax=0.25
+			first_sig=0.24
+			second_sig=0.23
+			diff_sig=0.22
+	
+		os.chdir(str(pp))
+		
+		A=np.load('slopes.npy')
+		
+		sig1=A[:,:,0]  # homo  # no. mouse X no. time points X (homo or hetero)
+		sig2=A[:,:,1]  # hetero  
+		
+		"""
+		if pp==10 or pp==20:
+			sig1[:,15:]=replace_consecutive_above_threshold(sig1[:,15:], threshold=0.3)
+			sig2[:,15:]=replace_consecutive_above_threshold(sig2[:,15:], threshold=0.3)
+			
+			sig1[:,15:]=replace_consecutive_below_threshold(sig1[:,15:], threshold=-0.3)
+			sig2[:,15:]=replace_consecutive_below_threshold(sig2[:,15:], threshold=-0.3)
+		"""	
+		
+		fig, ax = plt.subplots(1,1,figsize=(7,7))	
+		# plot the mean and error bar
+		ax.plot(tt,np.mean(sig1,0),'r-',tt,np.mean(sig2,0),'b-',linewidth=plt_lwd) 
+		ax.fill_between(tt,np.mean(sig1,0)- (np.std(sig1,0)/np.sqrt(sig1.shape[0])),  
+						   np.mean(sig1,0)+ (np.std(sig1,0)/np.sqrt(sig1.shape[0])),alpha=alp,color='r')
+		ax.fill_between(tt,np.mean(sig2,0)- (np.std(sig2,0)/np.sqrt(sig2.shape[0])),  
+						   np.mean(sig2,0)+ (np.std(sig2,0)/np.sqrt(sig2.shape[0])),alpha=alp,color='b') 
+
+		
+		# permutation clustering for homo
+		T_obs, clusters, cluster_p_values, H0 = permutation_cluster_1samp_test(sig1,
+																			   tail=1,
+																			   n_permutations=nperm)
+		clus=[]
+		p=0
+		for k in cluster_p_values:
+			if k<(cluster_alpha):
+				clus.extend(clusters[p])
+				p=p+1
+			else:
+				p=p+1 
+
+		if len(clus):
+			sig_tt=tt[np.concatenate(clus)]  # Significant time points
+			ax.plot(sig_tt,np.repeat(first_sig,len(sig_tt)),'r-', linewidth=lwd)
+	
+		#slope_sig1=np.mean(A[:,np.concatenate(clus),0],1)	
+		
+		print('Slope sig 1', slope_sig1)
+		# permutation clustering for hetero
+		T_obs, clusters, cluster_p_values, H0 = permutation_cluster_1samp_test(sig2,
+																			   tail=1,
+																		   n_permutations=nperm)
+		
+		clus=[]
+		p=0
+		for k in cluster_p_values:
+			if k<(cluster_alpha):
+				clus.extend(clusters[p])
+				p=p+1
+			else:
+				p=p+1 
+		if len(clus):
+			sig_tt=tt[np.concatenate(clus)]  # Significant time points
+			ax.plot(sig_tt,np.repeat(second_sig,len(sig_tt)),'b-', linewidth=lwd) 
+		
+		#slope_sig2=np.mean(A[:,np.concatenate(clus),1],1)
+		
+
+		#res=np.column_stack((slope_sig1,slope_sig2))
+		#np.savetxt(os.path.join('/home/olive/Desktop/res/',paradigm,folder+'_'+str(pp)+'.csv'),res,delimiter=',')
+
+		# permuation clustering for homo-hetero
+		T_obs, clusters, cluster_p_values, H0 = permutation_cluster_1samp_test(sig1-sig2,
+																			   tail=0,
+																			   n_permutations=nperm)
+		clus=[]
+		p=0
+		for k in cluster_p_values:
+			if k<(cluster_alpha):
+				clus.extend(clusters[p])
+				p=p+1
+			else:
+				p=p+1 
+		if len(clus):
+			sig_tt=tt[np.concatenate(clus)]  # Significant time points
+			ax.plot(sig_tt,np.repeat(diff_sig,len(sig_tt)),'k-', linewidth=lwd) 
+		
+		
+		ax.set_xticks([0, 1,2,3,4,5]) 
+		ax.set_yticks(np.arange(-0.2,ymax,0.1)) 
+		ax.set_xlim(xmin, xmax) 
+		ax.axvline(x=0,color='k',linestyle='--',lw=1)  
+		ax.axhline(y=0,color='k',linestyle='--',lw=1)  
+		ax.set_ylim(round(ymin,2), round(ymax,2))  
+		ax.spines[['top','right']].set_visible(False) 
+		ax.spines[['bottom','left']].set_linewidth(3)
+ 
+		#ax.text(2.5,0.01, '(N=8)',fontsize=32) 
+		#ax.text(-1.3,-0.077, '$-0.5$',fontsize=24) 
+		ax.tick_params(axis='both', which='major', labelsize=24) 
+		
+		fig.tight_layout(pad=2)   
+		#plt.show() 
+		save_file_name=paradigm + '_' + folder + '_'+str(pp)+'.png'
+		fig.savefig(os.path.join(decoding_res_fig_path,save_file_name),dpi=300) 
+		os.chdir('..')
+		
+		
+# montaging (this will work only if your system is Linux and montage installed))
+if is_montage_installed():
+	os.chdir(decoding_res_fig_path)
+	create_dir('montages')
+
+	fname='montages/Task_V1_45.png' 
+	status=os.system('montage task_V1_45_0.png task_V1_45_10.png task_V1_45_20.png task_V1_45_40.png task_V1_45_60.png  task_V1_45_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
+
+	fname='montages/Task_V1_90.png' 
+	status=os.system('montage task_V1_90_0.png task_V1_90_10.png task_V1_90_20.png task_V1_90_40.png task_V1_90_60.png  task_V1_90_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
+
+	fname='montages/Task_V1_135.png' 
+	status=os.system('montage task_V1_135_0.png task_V1_135_10.png task_V1_135_20.png task_V1_135_40.png task_V1_135_60.png  task_V1_135_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
+			
+	fname='montages/Task_PPC_45.png' 
+	status=os.system('montage task_PPC_45_0.png task_PPC_45_10.png task_PPC_45_20.png task_PPC_45_40.png task_PPC_45_60.png  task_PPC_45_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
+
+	fname='montages/Task_PPC_90.png' 
+	status=os.system('montage task_PPC_90_0.png task_PPC_90_10.png task_PPC_90_20.png task_PPC_90_40.png task_PPC_90_60.png  task_PPC_90_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
+
+	fname='montages/Task_PPC_135.png' 
+	status=os.system('montage task_PPC_135_0.png task_PPC_135_10.png task_PPC_135_20.png task_PPC_135_40.png task_PPC_135_60.png  task_PPC_135_100.png   -tile 6x1  -geometry +1+1 ' + fname)
+else:
+	print_status('Montage NOT installed in your computer. Skipping...') 
+
+		
+
+			
+"""				
+A=np.load('/media/olive/Research/oliver/IEMdecodingForCalciumData/pop_decoding/tuning_curves/task/V1_135/100/Mouse3.npy')
+
+B=zero_center_the_tcs(A,shift=wrap_around)
+
+plt.imshow(B[:,0,:],cmap='jet',extent=(0,120,0,50))
+plt.show()
+ 
+plt.imshow(B[:,1,:],cmap='jet',extent=(0,120,0,50))
+plt.show()
+
+plt.imshow(C[:,:,0],cmap='jet',extent=(0,120,0,50))
+plt.show()
+ 
+plt.imshow(C[:,:,1],cmap='jet',extent=(0,120,0,50))
+plt.show()
 """
