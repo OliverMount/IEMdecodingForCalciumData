@@ -105,8 +105,9 @@ plt.plot(test[:,7])
 
 
 
-test=A[:,:,0,90] 
+test=A[:,:,0,1] 
 plt.plot(test) 
+
 for k in range(test.shape[0]):
     test[:,k]=test[:,k]/max(test[:,k])
 plt.plot(test) 
@@ -115,10 +116,18 @@ plt.plot(test)
 np.roll(test[:,6],-2)
 
 
-def rotate_all(test): 
-    for k in range(test.shape[0]):
-        test[:,k]=np.roll(test[:,k],center_around-1-k)
-    return test
+def rotate_all(a):  
+    res=np.zeros_like(a)
+    for k in range(a.shape[0]):
+        res[:,k]=np.roll(a[:,k],center_around-1-k)
+    return res
+
+a=rotate_all(test)
+plt.plot(a,'.-')
+plt.show()
+
+plt.plot(np.mean(a,1),'g.-')
+plt.show()
 
 test=A[:,:,0,70].T 
 for k in range(test.shape[0]):

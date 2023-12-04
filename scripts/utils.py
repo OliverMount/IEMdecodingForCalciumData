@@ -19,57 +19,57 @@ center_around=5  # Center the tuning curves around this angle
 
 
 def replace_consecutive_above_threshold(array, threshold=0.3):
-    result = array.copy()
+	result = array.copy()
 
-    for i in range(array.shape[0]):  # Iterate over rows
-        j = 0
-        while j < array.shape[1]:
-            if array[i, j] > threshold:
-                # Find the consecutive region above the threshold
-                start_idx = j
-                while j < array.shape[1] and array[i, j] > threshold:
-                    j += 1
-                end_idx = j - 1
+	for i in range(array.shape[0]):  # Iterate over rows
+		j = 0
+		while j < array.shape[1]:
+			if array[i, j] > threshold:
+				# Find the consecutive region above the threshold
+				start_idx = j
+				while j < array.shape[1] and array[i, j] > threshold:
+					j += 1
+				end_idx = j - 1
 
-                # Replace the consecutive values with the average of points before and after the region
-                prev_value = array[i, start_idx-1] if start_idx > 0 else array[i, start_idx]
-                next_value = array[i, end_idx+1] if end_idx < array.shape[1] - 1 else array[i, end_idx]
+				# Replace the consecutive values with the average of points before and after the region
+				prev_value = array[i, start_idx-1] if start_idx > 0 else array[i, start_idx]
+				next_value = array[i, end_idx+1] if end_idx < array.shape[1] - 1 else array[i, end_idx]
 
-                avg_value = (prev_value + next_value) / 2
+				avg_value = (prev_value + next_value) / 2
 
-                # Update the consecutive region with the average value
-                result[i, start_idx:end_idx+1] = avg_value
-            else:
-                j += 1
+				# Update the consecutive region with the average value
+				result[i, start_idx:end_idx+1] = avg_value
+			else:
+				j += 1
 
-    return result
+	return result
 
 
 def replace_consecutive_below_threshold(array, threshold=-0.3):
-    result = array.copy()
+	result = array.copy()
 
-    for i in range(array.shape[0]):  # Iterate over rows
-        j = 0
-        while j < array.shape[1]:
-            if array[i, j] < threshold:
-                # Find the consecutive region below the threshold
-                start_idx = j
-                while j < array.shape[1] and array[i, j] < threshold:
-                    j += 1
-                end_idx = j - 1
+	for i in range(array.shape[0]):  # Iterate over rows
+		j = 0
+		while j < array.shape[1]:
+			if array[i, j] < threshold:
+				# Find the consecutive region below the threshold
+				start_idx = j
+				while j < array.shape[1] and array[i, j] < threshold:
+					j += 1
+				end_idx = j - 1
 
-                # Replace the consecutive values with the average of points before and after the region
-                prev_value = array[i, start_idx-1] if start_idx > 0 else array[i, start_idx]
-                next_value = array[i, end_idx+1] if end_idx < array.shape[1] - 1 else array[i, end_idx]
+				# Replace the consecutive values with the average of points before and after the region
+				prev_value = array[i, start_idx-1] if start_idx > 0 else array[i, start_idx]
+				next_value = array[i, end_idx+1] if end_idx < array.shape[1] - 1 else array[i, end_idx]
 
-                avg_value = (prev_value + next_value) / 2
+				avg_value = (prev_value + next_value) / 2
 
-                # Update the consecutive region with the average value
-                result[i, start_idx:end_idx+1] = avg_value
-            else:
-                j += 1
+				# Update the consecutive region with the average value
+				result[i, start_idx:end_idx+1] = avg_value
+			else:
+				j += 1
 
-    return result
+	return result
 
 
 
@@ -442,8 +442,8 @@ def is_montage_installed():
 		return True
 	except subprocess.CalledProcessError:
 		return False
-    
-    
+	
+	
 def run_parallel_the_pop_decoding(ho,he,ho_la,he_la,Info,nt):
 	
 	n_cpu = mp.cpu_count()  # Total number of CPU
@@ -487,10 +487,10 @@ def pop_decode_at_a_single_timept(ho,he,ho_la,he_la,Info):
 		# For each tuning neuron (subset the data based on neurons)
 		for l in range(1,ns+1): 
 			idx_homo=np.where(Info['Pref.Homo']==l)[0]
-            #idx_homo=np.array(Info[Info['Pref.Homo']==l]['Neuron'])
+			#idx_homo=np.array(Info[Info['Pref.Homo']==l]['Neuron'])
 			idx_hetero=np.where(Info['Pref.Hetero']==l)[0] 
 			#idx_hetero=np.array(Info[Info['Pref.Hetero']==l]['Neuron'])
-            
+			
 			# subsetted data based on the tuned neurons (if they exists)
 			if len(idx_homo)!=0:
 				ho_subset2=ho_subset_1[idx_homo,:]
@@ -513,13 +513,5 @@ def pop_decode_at_a_single_timept(ho,he,ho_la,he_la,Info):
 			res_ho_std[l-1,k-1]=ho_std
 			res_he_std[l-1,k-1]=he_std 
 			
-	return np.stack((res_ho_mean,res_he_mean,res_ho_std,res_he_std),axis=-1)  
-
-
-def get_tuning_curve(data,labels,dur_from=40,dur_to=120): 
-    return np.array([np.mean(data[labels==k,dur_from:dur_to]) for k in range(1,ns+1)])
-     
-def get_preference(data,labels,dur_from=40,dur_to=120):
-    
-    tc=get_tuning_curve(data,labels,dur_from=dur_from,dur_to=dur_to)
-    return np.where(tc==np.max(tc))[0]+1  # index from 1 to 8 
+	#eturn np.stack((res_ho_mean,res_he_mean,res_ho_std,res_he_std),axis=-1) 
+	return np.stack((res_ho_mean,res_he_mean),axis=-1)  

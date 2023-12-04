@@ -193,6 +193,14 @@ for k in ROIs_hetero:
 # Percentage of cells to use for decoding (tuned + % of untuned cells)
 percent_data=[0,10,20,40,60,100]	
 
+def get_tuning_curve(data,labels,dur_from=40,dur_to=120): 
+    return np.array([np.mean(data[labels==k,dur_from:dur_to]) for k in range(1,ns+1)])
+     
+def get_preference(data,labels,dur_from=40,dur_to=120):
+    
+    tc=get_tuning_curve(data,labels,dur_from=dur_from,dur_to=dur_to)
+    return np.where(tc==np.max(tc))[0]+1  # index from 1 to 8 
+
 
 #########################################################################################
 ############################  ANALYSIS FOR TASK DATA #####################################
@@ -410,10 +418,9 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 
 # Centering and computing slopes
 
-""" 
+"""
 # Slope dynamics computation and storing the results
-for roi in ROIs_hetero:   # For each condition 
-	
+for roi in ROIs_hetero:   # For each condition  
 	for pp in percent_data: # For each percentage of data 
 		
 		os.chdir(os.path.join(decoding_res_data_path, paradigm))
@@ -440,7 +447,7 @@ for roi in ROIs_hetero:   # For each condition
 
 				A=np.load(ani_list[p+1])  # Load the tuning curve data 
 				
-				B=avg_across_zero_centered_tcs(A,shift=wrap_around)
+				B=zero_center_the_tcs(A,shift=wrap_around)
 
 				if Gaussian_smoothening_needed:
 					print_status('Gaussian smoothening desired!') 
