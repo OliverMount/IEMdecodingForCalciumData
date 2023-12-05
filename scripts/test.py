@@ -100,8 +100,9 @@ plt.plot(res_he_mean[:,7])
 plt.imshow(A[:,:,0,70])
 plt.imshow(A[:,:,1,70])
 
-test=A[:,:,0,70] 
-plt.plot(test[:,7])
+A=run_parallel_the_pop_decoding(homo_data_p,hetero_data_p,homo_labels,hetero_labels,PrefDirInfo,nt)
+test=A[:,:,0,50] 
+plt.plot(test,'.-')
 
 
 
@@ -126,8 +127,11 @@ a=rotate_all(test)
 plt.plot(a,'.-')
 plt.show()
 
-plt.plot(np.mean(a,1),'g.-')
+plt.plot(np.mean(a,1),'k.-')
 plt.show()
+
+plt.imshow()
+
 
 test=A[:,:,0,70].T 
 for k in range(test.shape[0]):

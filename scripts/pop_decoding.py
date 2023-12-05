@@ -102,10 +102,18 @@ xmin=-0.5
 xmax=4
 
 ymin=-0.05
+ymax=0.3
+first_sig=0.29
+second_sig=0.28
+diff_sig=0.27
+
+"""
+ymin=-0.05
 ymax=0.25 
 first_sig=0.24
 second_sig=0.23
 diff_sig=0.22
+"""
 
 lwd=3
 plt_lwd=3
@@ -387,8 +395,7 @@ for roi in ROIs_hetero:   # For each condition
 			else:
 				print_status('Already done with slope computations') 
 				
-		np.save(fname,slopes) 
-		
+		np.save(fname,slopes)  
 
 		
 plots_data_dir=decoding_res_fig_path
@@ -402,66 +409,15 @@ for folder in ROIs_hetero:  # for each folder
 	os.chdir(os.path.join(decoding_res_slopes_path,paradigm))
 	os.chdir(folder)
 	
-	for pp in percent_data: # for each p-value percentage
-	
-		if folder =='V1_45' and pp==10:
-			ymin=-0.05
-			ymax=0.25
-			first_sig=0.24
-			second_sig=0.23
-			diff_sig=0.22
-		elif folder=='V1_90' and pp==10:
-			ymin=-0.05
-			ymax=0.25
-			first_sig=0.39
-			second_sig=0.38
-			diff_sig=0.37
-		elif folder=='V1_135' and pp==10:
-			ymin=-0.05
-			ymax=0.25
-			first_sig=0.24
-			second_sig=0.23
-			diff_sig=0.22
-		elif folder =='PPC_45' and pp==10:
-			ymin=-0.05
-			ymax=0.25
-			first_sig=0.24
-			second_sig=0.23
-			diff_sig=0.22
-		elif folder=='PPC_90' and pp==10:
-			ymin=-0.05
-			ymax=0.25
-			first_sig=0.24
-			second_sig=0.23
-			diff_sig=0.22
-		elif folder=='PPC_135' and pp==10:
-			ymin=-0.05
-			ymax=0.25
-			first_sig=0.24
-			second_sig=0.23
-			diff_sig=0.22
-		else:
-			ymin=-0.05
-			ymax=0.25
-			first_sig=0.24
-			second_sig=0.23
-			diff_sig=0.22
+	for pp in percent_data: # for each p-value percentage 
+		
 	
 		os.chdir(str(pp))
 		
 		A=np.load('slopes.npy')
 		
 		sig1=A[:,:,0]  # homo  # no. mouse X no. time points X (homo or hetero)
-		sig2=A[:,:,1]  # hetero  
-		
-		"""
-		if pp==10 or pp==20:
-			sig1[:,15:]=replace_consecutive_above_threshold(sig1[:,15:], threshold=0.3)
-			sig2[:,15:]=replace_consecutive_above_threshold(sig2[:,15:], threshold=0.3)
-			
-			sig1[:,15:]=replace_consecutive_below_threshold(sig1[:,15:], threshold=-0.3)
-			sig2[:,15:]=replace_consecutive_below_threshold(sig2[:,15:], threshold=-0.3)
-		"""	
+		sig2=A[:,:,1]  # hetero   
 		
 		fig, ax = plt.subplots(1,1,figsize=(7,7))	
 		# plot the mean and error bar
@@ -483,15 +439,21 @@ for folder in ROIs_hetero:  # for each folder
 				clus.extend(clusters[p])
 				p=p+1
 			else:
-				p=p+1 
+				p=p+1  
 
 		if len(clus):
-			sig_tt=tt[np.concatenate(clus)]  # Significant time points
-			ax.plot(sig_tt,np.repeat(first_sig,len(sig_tt)),'r-', linewidth=lwd)
-	
-		#slope_sig1=np.mean(A[:,np.concatenate(clus),0],1)	
+			
+			clus=np.concatenate(clus)
+			clus=clus[clus>20]
+			
+			sig_tt=tt[clus]  # Significant time points
+			ax.plot(sig_tt,np.repeat(first_sig,len(sig_tt)),'r-', linewidth=lwd) 
+			slope_sig1=np.mean(A[:,clus,0],1)	
+		else:
+			print_status('No Significant clusters in ' + folder + '  ' + str(pp) +' (homo) case')
+			slope_sig1=np.zeros(sig1.shape[0])
 		
-		print('Slope sig 1', slope_sig1)
+		#print('Slope sig 1', slope_sig1)
 		# permutation clustering for hetero
 		T_obs, clusters, cluster_p_values, H0 = permutation_cluster_1samp_test(sig2,
 																			   tail=1,
@@ -505,15 +467,23 @@ for folder in ROIs_hetero:  # for each folder
 				p=p+1
 			else:
 				p=p+1 
+				
 		if len(clus):
-			sig_tt=tt[np.concatenate(clus)]  # Significant time points
+			
+			clus=clus=np.concatenate(clus)
+			clus=clus[clus>20]
+			
+			sig_tt=tt[clus]  # Significant time points
 			ax.plot(sig_tt,np.repeat(second_sig,len(sig_tt)),'b-', linewidth=lwd) 
 		
-		#slope_sig2=np.mean(A[:,np.concatenate(clus),1],1)
+			slope_sig2=np.mean(A[:,clus,1],1)
+		else:
+			print_status('No Significant clusters in ' + folder + '  ' + str(pp) +' (hetero) case')
+			slope_sig2=np.zeros(sig2.shape[0])
 		
 
-		#res=np.column_stack((slope_sig1,slope_sig2))
-		#np.savetxt(os.path.join('/home/olive/Desktop/res/',paradigm,folder+'_'+str(pp)+'.csv'),res,delimiter=',')
+		res=np.column_stack((slope_sig1,slope_sig2))
+		np.savetxt(os.path.join('/media/olive/Research/oliver/pop_slopes/',paradigm,folder+'_'+str(pp)+'.csv'),res,delimiter=',')
 
 		# permuation clustering for homo-hetero
 		T_obs, clusters, cluster_p_values, H0 = permutation_cluster_1samp_test(sig1-sig2,
@@ -533,7 +503,7 @@ for folder in ROIs_hetero:  # for each folder
 		
 		
 		ax.set_xticks([0, 1,2,3,4,5]) 
-		ax.set_yticks(np.arange(-0.2,ymax,0.1)) 
+		ax.set_yticks(np.arange(-0.2,ymax+0.01,0.1)) 
 		ax.set_xlim(xmin, xmax) 
 		ax.axvline(x=0,color='k',linestyle='--',lw=1)  
 		ax.axhline(y=0,color='k',linestyle='--',lw=1)  
