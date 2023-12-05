@@ -783,35 +783,33 @@ for roi in ROIs_hetero:  # for each roi
 		#plt.show() 
 		save_file_name='Combined_' + roi + '_'+str(pp)+'.png'
 		fig.savefig(os.path.join(decoding_res_fig_path,save_file_name),dpi=300) 
-		os.chdir('..')
-		
+		os.chdir('..') 
 		
 # montaging (this will work only if your system is Linux and montage installed))
 if is_montage_installed():
 	os.chdir(decoding_res_fig_path)
 	create_dir('montages') 
     
-	fname='montages/Task_V1_45.png' 
+	fname='montages/V1_45.png' 
 	status=os.system('montage Combined_V1_45_0.png Combined_V1_45_10.png Combined_V1_45_20.png Combined_V1_45_40.png Combined_V1_45_60.png  Combined_V1_45_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
 
-	fname='montages/Task_V1_90.png' 
+	fname='montages/V1_90.png' 
 	status=os.system('montage Combined_V1_90_0.png Combined_V1_90_10.png Combined_V1_90_20.png Combined_V1_90_40.png Combined_V1_90_60.png  Combined_V1_90_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
 
-	fname='montages/Task_V1_135.png' 
+	fname='montages/V1_135.png' 
 	status=os.system('montage Combined_V1_135_0.png Combined_V1_135_10.png Combined_V1_135_20.png Combined_V1_135_40.png Combined_V1_135_60.png  Combined_V1_135_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
 			
-	fname='montages/Task_PPC_45.png' 
+	fname='montages/PPC_45.png' 
 	status=os.system('montage Combined_PPC_45_0.png Combined_PPC_45_10.png Combined_PPC_45_20.png Combined_PPC_45_40.png Combined_PPC_45_60.png  Combined_PPC_45_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
 
-	fname='montages/Task_PPC_90.png' 
+	fname='montages/PPC_90.png' 
 	status=os.system('montage Combined_PPC_90_0.png Combined_PPC_90_10.png Combined_PPC_90_20.png Combined_PPC_90_40.png Combined_PPC_90_60.png  Combined_PPC_90_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
 
-	fname='montages/Task_PPC_135.png' 
+	fname='montages/PPC_135.png' 
 	status=os.system('montage Combined_PPC_135_0.png Combined_PPC_135_10.png Combined_PPC_135_20.png Combined_PPC_135_40.png Combined_PPC_135_60.png  Combined_PPC_135_100.png   -tile 6x1  -geometry +1+1 ' + fname)
 else:
 	print_status('Montage NOT installed in your computer. Skipping...') 
-
-  
+ 
 	
 """ 
 # Plotting and montaging for one condition (as in the First submission)
@@ -936,8 +934,7 @@ for folder in ROIs_hetero:  # for each folder
 		#plt.show() 
 		save_file_name=paradigm + '_' + folder + '_'+str(pp)+'.png'
 		fig.savefig(os.path.join(decoding_res_fig_path,save_file_name),dpi=300) 
-		os.chdir('..')
-		
+		os.chdir('..') 
 		
 # montaging (this will work only if your system is Linux and montage installed))
 if is_montage_installed():
@@ -964,4 +961,4 @@ if is_montage_installed():
 else:
 	print_status('Montage NOT installed in your computer. Skipping...') 
 
-"""		 
+"""	 
