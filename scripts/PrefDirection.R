@@ -1,4 +1,4 @@
-# Preferred direction of neurons and their p-val (for whether it is a tuned to one direction)  
+# Combining to a single data frame of preferred direction of neurons and their p-val (for whether it is a tuned to one direction)  
 
 rm(list = ls())
 
@@ -24,8 +24,7 @@ setwd(file.path(base_path,paradigm))
 
 conds=list.files(pattern = '.mat')
 
- # run this only one time
-
+ # run this only once to get the  
 for (cond in conds){   # for each condition
   cond_name<- gsub("\\.mat", "", cond)
   
@@ -75,3 +74,62 @@ for (cond in conds){   # for each condition
   write.csv(df,file=file.path(base_path,paradigm,paste0(cond_name,'_prefer.csv')))
   
 } 
+
+
+########  passive data ########
+paradigm<-'passive'
+setwd(file.path(base_path,paradigm))
+
+conds=list.files(pattern = '.mat')
+
+# run this only once to get the  
+for (cond in conds){   # for each condition
+  cond_name<- gsub("\\.mat", "", cond)
+  
+  # loading preferred direction  file
+  A<-readMat(cond)    
+  A$prefDir.homo<- Filter(Negate(is.null), A$prefDir.homo)  # remove the empty list values
+  L<- length(A$prefDir.homo) 
+  A$prefDir.hetero<- Filter(Negate(is.null), A$prefDir.hetero)
+  
+  # loading the p-value file
+  B<- readMat(file.path(pval_path,paradigm,cond))
+  
+  
+  df<-data.frame(Sub=rep(NA,1),Condition=rep(NA,1),Group=rep(NA,1),Pvalue=rep(NA,1),Preference=rep(NA,1))
+  
+  for (k in 1:L){  # for each animal   
+    homo<- as.numeric(unlist(A$prefDir.homo[[k]][[1]][[1]]))
+    hetero<-  as.numeric(unlist(A$prefDir.hetero[[k]][[1]][[1]]))
+    
+    ho_p<-as.numeric(unlist(B$homo[[k]]))
+    he_p<-as.numeric(unlist(B$hetero[[k]]))
+    
+    Lf<- length(homo)
+    
+    # For homo
+    temp<-data.frame(Sub=rep(paste0("Animal.",k),Lf),
+                     Condition=rep(cond_name,Lf),
+                     Group=rep("homo",Lf),
+                     Pvalue=ho_p,
+                     Preference=homo) 
+    
+    df<-rbind(df,temp)  
+    
+    # for hetero
+    temp<-data.frame(Sub=rep(paste0("Animal.",k),Lf),
+                     Condition=rep(cond_name,Lf),
+                     Group=rep("hetero",Lf),
+                     Pvalue=he_p,
+                     Preference=hetero) 
+    
+    df<-rbind(df,temp)   # combine homo and hetero
+    df<- na.omit(df)
+    
+  }
+  
+  row.names(df)<- 1:nrow(df)
+  write.csv(df,file=file.path(base_path,paradigm,paste0(cond_name,'_prefer.csv')))
+  
+} 
+

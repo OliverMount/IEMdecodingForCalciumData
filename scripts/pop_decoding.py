@@ -151,21 +151,17 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 	print_status('No. of animals in ' + roi + ' is ' + str(noa)) 
 	
 	# load the neuron preferences and pvalue for all animals 
+	# The csv file is created in R (pls. look at the script PrefDirection.R in the scripts folder)
 	B = pd.read_csv(os.path.join(pval_pref_path, paradigm,roi+'_prefer.csv'))
-	 
-	#C=loadmat(os.path.join(pval_path,paradigm+'_'+roi+'.mat'))
-	#Pval_homo = [element[0][0][0] for i in range(C['pVal_homo'].shape[0]) if np.size(C['pVal_homo'][i][0]) != 0 for element in C['pVal_homo'][i]]
-	#Pval_hetero= [element[0][0][0] for i in range(C['pVal_hetero'].shape[0]) if np.size(C['pVal_hetero'][i][0]) != 0 for element in C['pVal_hetero'][i]]
-	
+	  
 	if roi.startswith('V1'):
 		list_for_sorting=V1_task
 	else:
 		list_for_sorting=PPC_task 
 	
 	ani_list=[[file for file in ani_list if file.lower().endswith(suffix.lower())] for suffix in list_for_sorting]
-	ani_list= [ani[0] for ani in ani_list]
-	
-	st_roi = time.time()
+	ani_list= [ani[0] for ani in ani_list] 
+	 
 	for p in range(len(ani_list)):   # For each animal
 	#for p in range(1):	
 		# load that animal data in homo and hetero group  
@@ -194,34 +190,8 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 		pref_df = pref_df.copy()  # to avoid the copy warnings
 		pref_df['Neuron'] = final.index.to_list()
 		pref_df.rename(columns={'Preference_x': 'Pref.Homo', 'Preference_y': 'Pref.Hetero'}, inplace=True)
-		pref_df.reset_index(drop=True, inplace=True)
-		
-		#df_homo_final=df_homo.iloc[indices]
-		#df_hetero_final=df_hetero.iloc[indices] 
-		
-		#df_homo_final.reset_index(drop=True, inplace=True)
-		#df_hetero_final.reset_index(drop=True, inplace=True)  
-		
-		# This is for data sorting according to P-value
-		#idx_homo=np.argsort(df_homo['Pvalue'])  # homo in the ascending order
-		
-		# not subsetting (just arranging according to the p-value)
-		#df_homo_sorted=df_homo.loc[idx_homo]
-		#df_hetero_sorted=df_hetero.loc[idx_homo]
+		pref_df.reset_index(drop=True, inplace=True) 
 		 
-		#Ltuned=len(np.where(df_homo['Pvalue']<=pval_thresold)[0])
-		#df_homo_final.shape[0]
-		
-		#idx_hetero=np.argsort(df_hetero['Pvalue'])  # hetero in the ascending order
-		#Ltuned=len(np.where(df_hetero['Pvalue']<=pval_thresold)[0])
-		
-		#df_homo_final=df_homo.iloc[idx_homo[:Ltuned]]
-		#df_heter_final=df_hetero.iloc[idx_homo[:Ltuned]]
-		
-		#df=df_homo[df_homo['Pvalue']<=pval_thresold]
-		#df_homo=B[ (B['Sub']=='Animal.'+str(p+1)) & (B['Group'] =='homo') & (B['Pvalue']<= pval_thresold)]
-		#df_hetero=B[ (B['Sub']=='Animal.'+str(p+1)) & (B['Group'] =='homo') & (B['Pvalue']<= pval_thresold) & ()]
-		
 		print_status('Dealing with the animal ' + ani_list[p])
 		
 		A=loadmat(ani_list[p])	 # Load the data
@@ -247,20 +217,7 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 		
 		idx=np.random.permutation(len(hetero_labels))
 		hetero_labels=hetero_labels[idx]
-		hetero_data=hetero_data[:,idx,:]
-		
-		#print_status('Before subsetting the data')
-		#print_status('Homo. shape is ' + str(homo_data.shape))
-		#print_status('Hetero. shape is ' + str(hetero_data.shape))   
-		
-		# arranging according to the p value arrangement of homo as before 
-		# homo_data=homo_data[idx_homo,:,:]  # arranging homo data accroding to sorted pvalue 
-		# hetero_data=hetero_data[idx_homo,:,:]  # arranging hetero data accroding to sorted pvalue 
-		
-		#print_status('After subsetting the data')
-		#print_status('Homo. shape is ' + str(homo_data.shape))
-		#print_status('Hetero. shape is ' + str(hetero_data.shape))   
-		#print_status('After subsetting data is used for decoding')
+		hetero_data=hetero_data[:,idx,:] 
 		
 		for pp in percent_data: 
 		
@@ -276,7 +233,7 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 				# hetero condition
 				if pp!=0:  # Other than tuned on both homo and hetero 
 					 
-					#hetero_data_p=hetero_data[:p_hetero,:,:] 
+					 
 					# first remove the tuned tuned one from the original df
 					df_homo_sorted_pp=df_homo_sorted.drop(TunedIndices) 
 					df_hetero_sorted_pp=df_hetero_sorted.drop(TunedIndices)
@@ -334,14 +291,11 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 				del A 
 					
 				print_status('Done with ' + str(p+1) + '/' + str(noa) + ' for the percentage '+ str(pp),'') 
-					
-				ed_roi = time.time()
-				elapsed_time = ed_roi - st_roi
-				print_status('Execution time for the whole roi is ' + str(elapsed_time))   
-		else:
-			print_status('Already done with ' + str(p+1) + '/' + str(noa) + ' for the percentage '+ str(pp),'') 
+					 
+			else:
+				print_status('Already done with ' + str(p+1) + '/' + str(noa) + ' for the percentage '+ str(pp),'') 
 
-# Centering and computing slopes 
+# Centering and computing slopes for task case
  
 # Slope dynamics computation and storing the results
 for roi in ROIs_hetero:   # For each condition  
@@ -396,12 +350,16 @@ for roi in ROIs_hetero:   # For each condition
 				print_status('Already done with slope computations') 
 				
 		np.save(fname,slopes)  
+        
+        
+############## passive data decoding   ################## 
 
-		
-plots_data_dir=decoding_res_fig_path
 
-os.chdir(os.path.join(decoding_res_slopes_path,paradigm))
 
+## Plotting the results 
+
+plots_data_dir=decoding_res_fig_path 
+os.chdir(os.path.join(decoding_res_slopes_path,paradigm)) 
 flist=os.listdir()
 
 for folder in ROIs_hetero:  # for each folder
@@ -547,7 +505,7 @@ if is_montage_installed():
 else:
 	print_status('Montage NOT installed in your computer. Skipping...') 
 
-		
+"""		
 ###################################### PASSIVE Condition #######################
 paradigm='passive' 
 # mouse name order
@@ -567,7 +525,7 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 	print_status('No. of animals in ' + roi + ' is ' + str(noa)) 
 	
 	# load the neuron preferences and pvalue for all animals 
-    # This file is prepared using the R script ()
+	# This file is prepared using the R script ()
 	B = pd.read_csv(os.path.join(pval_pref_path, paradigm,roi+'_prefer.csv'))
 	 
 	#C=loadmat(os.path.join(pval_path,paradigm+'_'+roi+'.mat'))
@@ -813,3 +771,4 @@ for roi in ROIs_hetero:   # For each condition
 				print_status('Already done with slope computations') 
 				
 		np.save(fname,slopes)  
+"""
