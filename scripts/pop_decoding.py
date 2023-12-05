@@ -366,7 +366,7 @@ PPC_passive=['3L.mat','3R.mat','Ylcb.mat', 'Ylch.mat','Ylci.mat','YLck.mat','Ylc
 
 for roi in ROIs_hetero:   # For each heterogeneous condition
 #for roi in ['V1_45']:	
-	os.chdir(data_path_task)
+	os.chdir(data_path_passive)
 	print_status('Dealing with ROI: ' + roi)
 	
 	os.chdir(roi)
@@ -379,7 +379,7 @@ for roi in ROIs_hetero:   # For each heterogeneous condition
 	
 	# load the neuron preferences and pvalue for all animals 
 	# The csv file is created in R (pls. look at the script PrefDirection.R in the scripts folder)
-	B = pd.read_csv(os.path.join(pval_pref_path, paradigm,roi+'_prefer.csv'))
+	B = pd.read_csv(os.path.join(pval_pref_path, paradigm,roi+'_prefer_passive.csv'))
 	  
 	if roi.startswith('V1'):
 		list_for_sorting=V1_passive

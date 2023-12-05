@@ -12,6 +12,8 @@ rois<-c('V1_45','V1_90','V1_135','PPC_45','PPC_90','PPC_135')
 percents<-c('0','10','20','40','60','100')
 
 
+# include passive here
+
 df<-data.frame(Condition=rep(NA,1),Percent=rep(NA,1),Homo=rep(NA,1), Hetero=rep(NA,1))
 
 for (roi in rois){ 
@@ -104,6 +106,10 @@ p <- ggplot(mean_data, aes(x = Percent, y = mean_value, group=variable, color = 
 
 # Print the plot
 print(p)
+
+
+
+
 
 
 ### IEM decoding
