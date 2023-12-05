@@ -1,4 +1,4 @@
-# Preferred orientation sorting out and plotting
+# Preferred direction of neurons and their p-val (for whether it is a tuned to one direction)  
 
 rm(list = ls())
 
@@ -31,10 +31,11 @@ for (cond in conds){   # for each condition
   
   # loading preferred direction  file
   A<-readMat(cond)    
-  A$prefDir.homo<- Filter(Negate(is.null), A$prefDir.homo)
+  A$prefDir.homo<- Filter(Negate(is.null), A$prefDir.homo)  # remove the empty list values
   L<- length(A$prefDir.homo) 
   A$prefDir.hetero<- Filter(Negate(is.null), A$prefDir.hetero)
   
+  # loading the p-value file
   B<- readMat(file.path(pval_path,paradigm,cond))
   
    

@@ -18,6 +18,8 @@ percent<- c(10,20,40,60,100)
 pval_threshold<-0.05
 nos<-8 # number of directions
 
+########## for TASK data  #############
+
 paradigm<-'task'
 setwd(file.path(base_path,paradigm))
 
@@ -68,9 +70,9 @@ for (cond in conds){   # for each condition
   
 }
 
+########## for PASSIVE data  #############
 
-
-paradigm<-'task'
+paradigm<-'passive'
 setwd(file.path(base_path,paradigm))
 
 conds=list.files(pattern = ".csv")
@@ -118,7 +120,4 @@ for (cond in conds){   # for each condition
   row.names(df)<- 1:nrow(df)
   write.csv(df,file=paste0(save_path,cond_name,'_prefer.csv')) 
   
-}
-
-
-
+} 
