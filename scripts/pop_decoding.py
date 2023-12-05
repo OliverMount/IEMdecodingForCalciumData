@@ -102,10 +102,15 @@ xmin=-0.5
 xmax=4
 
 ymin=-0.05
-ymax=0.3
-first_sig=0.29
-second_sig=0.28
-diff_sig=0.27
+ymax=0.33
+# for task
+first_sig_task=0.32
+second_sig_task=0.31
+diff_sig_task=0.30
+# for passive
+first_sig_passive=0.29
+second_sig_passive=0.28
+diff_sig_passive=0.27
 
 """
 ymin=-0.05
@@ -576,19 +581,16 @@ for roi in ROIs_hetero:   # For each condition
 #os.chdir(os.path.join(decoding_res_slopes_path,paradigm)) 
 #flist=os.listdir()
 
-for folder in ROIs_hetero:  # for each folder
-#for folder in ROIs_hetero[1:2]:  # for checking
-	os.chdir(os.path.join(decoding_res_slopes_path,paradigm))
-	os.chdir(folder)
-	
-	for pp in percent_data: # for each p-value percentage  
+for roi in ROIs_hetero:  # for each roi
+#for folder in ROIs_hetero[1:2]:  # for checking  
+	for pp in percent_data: # for each p-value percentage   
     
-		os.chdir(str(pp))
-		
-		A=np.load('slopes.npy')
-		
-		sig1=A[:,:,0]  # homo  # no. mouse X no. time points X (homo or hetero)
-		sig2=A[:,:,1]  # hetero   
+        # For task (solid lines) 
+		A_task=np.load(os.path.join(decoding_res_slopes_path,'task',roi,str(pp),'slopes.npy'))
+		A_passive=np.load(os.path.join(decoding_res_slopes_path,'paradigm',roi,str(pp),'slopes.npy'))
+        
+		sig1=A_task[:,:,0]  # homo  # no. mouse X no. time points X (homo or hetero)
+		sig2=A_task[:,:,1]  # hetero   
 		
 		fig, ax = plt.subplots(1,1,figsize=(7,7))	
 		# plot the mean and error bar
@@ -618,7 +620,7 @@ for folder in ROIs_hetero:  # for each folder
 			clus=clus[clus>20]
 			
 			sig_tt=tt[clus]  # Significant time points
-			ax.plot(sig_tt,np.repeat(first_sig,len(sig_tt)),'r-', linewidth=lwd) 
+			ax.plot(sig_tt,np.repeat(first_sig_task,len(sig_tt)),'r-', linewidth=lwd) 
 			slope_sig1=np.mean(A[:,clus,0],1)	
 		else:
 			print_status('No Significant clusters in ' + folder + '  ' + str(pp) +' (homo) case')
@@ -645,7 +647,7 @@ for folder in ROIs_hetero:  # for each folder
 			clus=clus[clus>20]
 			
 			sig_tt=tt[clus]  # Significant time points
-			ax.plot(sig_tt,np.repeat(second_sig,len(sig_tt)),'b-', linewidth=lwd) 
+			ax.plot(sig_tt,np.repeat(second_sig_task,len(sig_tt)),'b-', linewidth=lwd) 
 		
 			slope_sig2=np.mean(A[:,clus,1],1)
 		else:
@@ -668,9 +670,100 @@ for folder in ROIs_hetero:  # for each folder
 				p=p+1
 			else:
 				p=p+1 
+                
 		if len(clus):
 			sig_tt=tt[np.concatenate(clus)]  # Significant time points
-			ax.plot(sig_tt,np.repeat(diff_sig,len(sig_tt)),'k-', linewidth=lwd) 
+			ax.plot(sig_tt,np.repeat(diff_sig_task,len(sig_tt)),'k-', linewidth=lwd) 
+            
+            
+        ## plotting for passive 
+		A_passive=np.load(os.path.join(decoding_res_slopes_path,'paradigm',roi,str(pp),'slopes.npy'))
+        
+		sig1=A_passive[:,:,0]  # homo  # no. mouse X no. time points X (homo or hetero)
+		sig2=A_passive[:,:,1]  # hetero   
+		
+		fig, ax = plt.subplots(1,1,figsize=(7,7))	
+		# plot the mean and error bar
+		ax.plot(tt,np.mean(sig1,0),'r--',tt,np.mean(sig2,0),'b--',linewidth=plt_lwd) 
+		ax.fill_between(tt,np.mean(sig1,0)- (np.std(sig1,0)/np.sqrt(sig1.shape[0])),  
+						   np.mean(sig1,0)+ (np.std(sig1,0)/np.sqrt(sig1.shape[0])),alpha=alp,color='r')
+		ax.fill_between(tt,np.mean(sig2,0)- (np.std(sig2,0)/np.sqrt(sig2.shape[0])),  
+						   np.mean(sig2,0)+ (np.std(sig2,0)/np.sqrt(sig2.shape[0])),alpha=alp,color='b') 
+
+		
+		# permutation clustering for homo
+		T_obs, clusters, cluster_p_values, H0 = permutation_cluster_1samp_test(sig1,
+																			   tail=1,
+																			   n_permutations=nperm)
+		clus=[]
+		p=0
+		for k in cluster_p_values:
+			if k<(cluster_alpha):
+				clus.extend(clusters[p])
+				p=p+1
+			else:
+				p=p+1  
+
+		if len(clus):
+			
+			clus=np.concatenate(clus)
+			clus=clus[clus>20]
+			
+			sig_tt=tt[clus]  # Significant time points
+			ax.plot(sig_tt,np.repeat(first_sig_passive,len(sig_tt)),'r--', linewidth=lwd) 
+			slope_sig1=np.mean(A[:,clus,0],1)	
+		else:
+			print_status('No Significant clusters in ' + folder + '  ' + str(pp) +' (homo) case')
+			slope_sig1=np.zeros(sig1.shape[0])
+		
+		#print('Slope sig 1', slope_sig1)
+		# permutation clustering for hetero
+		T_obs, clusters, cluster_p_values, H0 = permutation_cluster_1samp_test(sig2,
+																			   tail=1,
+																		   n_permutations=nperm)
+		
+		clus=[]
+		p=0
+		for k in cluster_p_values:
+			if k<(cluster_alpha):
+				clus.extend(clusters[p])
+				p=p+1
+			else:
+				p=p+1 
+				
+		if len(clus):
+			
+			clus=clus=np.concatenate(clus)
+			clus=clus[clus>20]
+			
+			sig_tt=tt[clus]  # Significant time points
+			ax.plot(sig_tt,np.repeat(second_sig_passive,len(sig_tt)),'b--', linewidth=lwd) 
+		
+			slope_sig2=np.mean(A[:,clus,1],1)
+		else:
+			print_status('No Significant clusters in ' + folder + '  ' + str(pp) +' (hetero) case')
+			slope_sig2=np.zeros(sig2.shape[0])
+		
+
+		res=np.column_stack((slope_sig1,slope_sig2))
+		np.savetxt(os.path.join('/media/olive/Research/oliver/pop_slopes/',paradigm,folder+'_'+str(pp)+'.csv'),res,delimiter=',')
+
+		# permuation clustering for homo-hetero
+		T_obs, clusters, cluster_p_values, H0 = permutation_cluster_1samp_test(sig1-sig2,
+																			   tail=0,
+																			   n_permutations=nperm)
+		clus=[]
+		p=0
+		for k in cluster_p_values:
+			if k<(cluster_alpha):
+				clus.extend(clusters[p])
+				p=p+1
+			else:
+				p=p+1 
+                
+		if len(clus):
+			sig_tt=tt[np.concatenate(clus)]  # Significant time points
+			ax.plot(sig_tt,np.repeat(diff_sig_passive,len(sig_tt)),'k--', linewidth=lwd) 
 		
 		
 		ax.set_xticks([0, 1,2,3,4,5]) 
