@@ -564,19 +564,164 @@ for roi in ROIs_hetero:   # For each condition
 				# Hetero-case 
 				for time_pts in range(nt): 
 					slopes[p,time_pts,1]=esti_slope(slope_angles,S[:,time_pts,1],intercept=True, standardise=False)   
-				 
-				
+				  
 			else:
-				print_status('Already done with slope computations') 
-				
-		np.save(fname,slopes)   
-
+				print_status('Already done with slope computations')  
+		np.save(fname,slopes)  
+        
+         
  
+# Plotting and montaging  (with task as solid  line and passive as dashed line) 
+#plots_data_dir=decoding_res_fig_path 
+#os.chdir(os.path.join(decoding_res_slopes_path,paradigm)) 
+#flist=os.listdir()
 
+for folder in ROIs_hetero:  # for each folder
+#for folder in ROIs_hetero[1:2]:  # for checking
+	os.chdir(os.path.join(decoding_res_slopes_path,paradigm))
+	os.chdir(folder)
+	
+	for pp in percent_data: # for each p-value percentage  
+    
+		os.chdir(str(pp))
+		
+		A=np.load('slopes.npy')
+		
+		sig1=A[:,:,0]  # homo  # no. mouse X no. time points X (homo or hetero)
+		sig2=A[:,:,1]  # hetero   
+		
+		fig, ax = plt.subplots(1,1,figsize=(7,7))	
+		# plot the mean and error bar
+		ax.plot(tt,np.mean(sig1,0),'r-',tt,np.mean(sig2,0),'b-',linewidth=plt_lwd) 
+		ax.fill_between(tt,np.mean(sig1,0)- (np.std(sig1,0)/np.sqrt(sig1.shape[0])),  
+						   np.mean(sig1,0)+ (np.std(sig1,0)/np.sqrt(sig1.shape[0])),alpha=alp,color='r')
+		ax.fill_between(tt,np.mean(sig2,0)- (np.std(sig2,0)/np.sqrt(sig2.shape[0])),  
+						   np.mean(sig2,0)+ (np.std(sig2,0)/np.sqrt(sig2.shape[0])),alpha=alp,color='b') 
 
+		
+		# permutation clustering for homo
+		T_obs, clusters, cluster_p_values, H0 = permutation_cluster_1samp_test(sig1,
+																			   tail=1,
+																			   n_permutations=nperm)
+		clus=[]
+		p=0
+		for k in cluster_p_values:
+			if k<(cluster_alpha):
+				clus.extend(clusters[p])
+				p=p+1
+			else:
+				p=p+1  
 
+		if len(clus):
+			
+			clus=np.concatenate(clus)
+			clus=clus[clus>20]
+			
+			sig_tt=tt[clus]  # Significant time points
+			ax.plot(sig_tt,np.repeat(first_sig,len(sig_tt)),'r-', linewidth=lwd) 
+			slope_sig1=np.mean(A[:,clus,0],1)	
+		else:
+			print_status('No Significant clusters in ' + folder + '  ' + str(pp) +' (homo) case')
+			slope_sig1=np.zeros(sig1.shape[0])
+		
+		#print('Slope sig 1', slope_sig1)
+		# permutation clustering for hetero
+		T_obs, clusters, cluster_p_values, H0 = permutation_cluster_1samp_test(sig2,
+																			   tail=1,
+																		   n_permutations=nperm)
+		
+		clus=[]
+		p=0
+		for k in cluster_p_values:
+			if k<(cluster_alpha):
+				clus.extend(clusters[p])
+				p=p+1
+			else:
+				p=p+1 
+				
+		if len(clus):
+			
+			clus=clus=np.concatenate(clus)
+			clus=clus[clus>20]
+			
+			sig_tt=tt[clus]  # Significant time points
+			ax.plot(sig_tt,np.repeat(second_sig,len(sig_tt)),'b-', linewidth=lwd) 
+		
+			slope_sig2=np.mean(A[:,clus,1],1)
+		else:
+			print_status('No Significant clusters in ' + folder + '  ' + str(pp) +' (hetero) case')
+			slope_sig2=np.zeros(sig2.shape[0])
+		
+
+		res=np.column_stack((slope_sig1,slope_sig2))
+		np.savetxt(os.path.join('/media/olive/Research/oliver/pop_slopes/',paradigm,folder+'_'+str(pp)+'.csv'),res,delimiter=',')
+
+		# permuation clustering for homo-hetero
+		T_obs, clusters, cluster_p_values, H0 = permutation_cluster_1samp_test(sig1-sig2,
+																			   tail=0,
+																			   n_permutations=nperm)
+		clus=[]
+		p=0
+		for k in cluster_p_values:
+			if k<(cluster_alpha):
+				clus.extend(clusters[p])
+				p=p+1
+			else:
+				p=p+1 
+		if len(clus):
+			sig_tt=tt[np.concatenate(clus)]  # Significant time points
+			ax.plot(sig_tt,np.repeat(diff_sig,len(sig_tt)),'k-', linewidth=lwd) 
+		
+		
+		ax.set_xticks([0, 1,2,3,4,5]) 
+		ax.set_yticks(np.arange(-0.2,ymax+0.01,0.1)) 
+		ax.set_xlim(xmin, xmax) 
+		ax.axvline(x=0,color='k',linestyle='--',lw=1)  
+		ax.axhline(y=0,color='k',linestyle='--',lw=1)  
+		ax.set_ylim(round(ymin,2), round(ymax,2))  
+		ax.spines[['top','right']].set_visible(False) 
+		ax.spines[['bottom','left']].set_linewidth(3)
+ 
+		#ax.text(2.5,0.01, '(N=8)',fontsize=32) 
+		#ax.text(-1.3,-0.077, '$-0.5$',fontsize=24) 
+		ax.tick_params(axis='both', which='major', labelsize=24) 
+		
+		fig.tight_layout(pad=2)   
+		#plt.show() 
+		save_file_name=paradigm + '_' + folder + '_'+str(pp)+'.png'
+		fig.savefig(os.path.join(decoding_res_fig_path,save_file_name),dpi=300) 
+		os.chdir('..')
+		
+		
+# montaging (this will work only if your system is Linux and montage installed))
+if is_montage_installed():
+	os.chdir(decoding_res_fig_path)
+	create_dir('montages')
+
+	fname='montages/Task_V1_45.png' 
+	status=os.system('montage task_V1_45_0.png task_V1_45_10.png task_V1_45_20.png task_V1_45_40.png task_V1_45_60.png  task_V1_45_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
+
+	fname='montages/Task_V1_90.png' 
+	status=os.system('montage task_V1_90_0.png task_V1_90_10.png task_V1_90_20.png task_V1_90_40.png task_V1_90_60.png  task_V1_90_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
+
+	fname='montages/Task_V1_135.png' 
+	status=os.system('montage task_V1_135_0.png task_V1_135_10.png task_V1_135_20.png task_V1_135_40.png task_V1_135_60.png  task_V1_135_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
+			
+	fname='montages/Task_PPC_45.png' 
+	status=os.system('montage task_PPC_45_0.png task_PPC_45_10.png task_PPC_45_20.png task_PPC_45_40.png task_PPC_45_60.png  task_PPC_45_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
+
+	fname='montages/Task_PPC_90.png' 
+	status=os.system('montage task_PPC_90_0.png task_PPC_90_10.png task_PPC_90_20.png task_PPC_90_40.png task_PPC_90_60.png  task_PPC_90_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
+
+	fname='montages/Task_PPC_135.png' 
+	status=os.system('montage task_PPC_135_0.png task_PPC_135_10.png task_PPC_135_20.png task_PPC_135_40.png task_PPC_135_60.png  task_PPC_135_100.png   -tile 6x1  -geometry +1+1 ' + fname)
+else:
+	print_status('Montage NOT installed in your computer. Skipping...') 
+
+  
+    
 """ 
-# Plotting for one condition
+# Plotting and montaging for one condition (as in the First submission)
 ## Plotting the results (task as solid  line and passive as dashed line)
 
 plots_data_dir=decoding_res_fig_path 
