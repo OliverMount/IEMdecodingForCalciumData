@@ -355,8 +355,8 @@ for roi in ROIs_hetero:   # For each condition
 				print_status('Already done with slope computations') 
 				
 		np.save(fname,slopes)  
-        
-        
+		
+		
 ############## passive data decoding   ################## 
 
 paradigm='passive' 
@@ -573,8 +573,8 @@ for roi in ROIs_hetero:   # For each condition
 			else:
 				print_status('Already done with slope computations')  
 		np.save(fname,slopes)  
-        
-         
+		
+		 
  
 # Plotting and montaging  (with task as solid  line and passive as dashed line) 
 #plots_data_dir=decoding_res_fig_path 
@@ -582,13 +582,12 @@ for roi in ROIs_hetero:   # For each condition
 #flist=os.listdir()
 
 for roi in ROIs_hetero:  # for each roi
-#for folder in ROIs_hetero[1:2]:  # for checking  
 	for pp in percent_data: # for each p-value percentage   
-    
-        # For task (solid lines) 
-		A_task=np.load(os.path.join(decoding_res_slopes_path,'task',roi,str(pp),'slopes.npy'))
-		A_passive=np.load(os.path.join(decoding_res_slopes_path,'paradigm',roi,str(pp),'slopes.npy'))
-        
+		
+		paradigm='task'
+		# For task (solid lines) 
+		A_task=np.load(os.path.join(decoding_res_slopes_path,paradigm,roi,str(pp),'slopes.npy'))
+		
 		sig1=A_task[:,:,0]  # homo  # no. mouse X no. time points X (homo or hetero)
 		sig2=A_task[:,:,1]  # hetero   
 		
@@ -623,7 +622,7 @@ for roi in ROIs_hetero:  # for each roi
 			ax.plot(sig_tt,np.repeat(first_sig_task,len(sig_tt)),'r-', linewidth=lwd) 
 			slope_sig1=np.mean(A[:,clus,0],1)	
 		else:
-			print_status('No Significant clusters in ' + folder + '  ' + str(pp) +' (homo) case')
+			print_status('No Significant clusters in ' + roi  + '  ' + str(pp) +' (homo) case')
 			slope_sig1=np.zeros(sig1.shape[0])
 		
 		#print('Slope sig 1', slope_sig1)
@@ -651,12 +650,12 @@ for roi in ROIs_hetero:  # for each roi
 		
 			slope_sig2=np.mean(A[:,clus,1],1)
 		else:
-			print_status('No Significant clusters in ' + folder + '  ' + str(pp) +' (hetero) case')
+			print_status('No Significant clusters in ' + roi + '  ' + str(pp) +' (hetero) case')
 			slope_sig2=np.zeros(sig2.shape[0])
 		
 
 		res=np.column_stack((slope_sig1,slope_sig2))
-		np.savetxt(os.path.join('/media/olive/Research/oliver/pop_slopes/',paradigm,folder+'_'+str(pp)+'.csv'),res,delimiter=',')
+		np.savetxt(os.path.join('/media/olive/Research/oliver/pop_slopes/',paradigm,roi+'_'+str(pp)+'.csv'),res,delimiter=',')
 
 		# permuation clustering for homo-hetero
 		T_obs, clusters, cluster_p_values, H0 = permutation_cluster_1samp_test(sig1-sig2,
@@ -670,15 +669,16 @@ for roi in ROIs_hetero:  # for each roi
 				p=p+1
 			else:
 				p=p+1 
-                
+				
 		if len(clus):
 			sig_tt=tt[np.concatenate(clus)]  # Significant time points
 			ax.plot(sig_tt,np.repeat(diff_sig_task,len(sig_tt)),'k-', linewidth=lwd) 
-            
-            
-        ## plotting for passive 
-		A_passive=np.load(os.path.join(decoding_res_slopes_path,'paradigm',roi,str(pp),'slopes.npy'))
-        
+			
+			
+		## plotting for passive 
+		paradigm='passive'
+		A_passive=np.load(os.path.join(decoding_res_slopes_path,paradigm,roi,str(pp),'slopes.npy'))
+		
 		sig1=A_passive[:,:,0]  # homo  # no. mouse X no. time points X (homo or hetero)
 		sig2=A_passive[:,:,1]  # hetero   
 		
@@ -713,7 +713,7 @@ for roi in ROIs_hetero:  # for each roi
 			ax.plot(sig_tt,np.repeat(first_sig_passive,len(sig_tt)),'r--', linewidth=lwd) 
 			slope_sig1=np.mean(A[:,clus,0],1)	
 		else:
-			print_status('No Significant clusters in ' + folder + '  ' + str(pp) +' (homo) case')
+			print_status('No Significant clusters in ' + roi + '  ' + str(pp) +' (homo) case')
 			slope_sig1=np.zeros(sig1.shape[0])
 		
 		#print('Slope sig 1', slope_sig1)
@@ -741,12 +741,12 @@ for roi in ROIs_hetero:  # for each roi
 		
 			slope_sig2=np.mean(A[:,clus,1],1)
 		else:
-			print_status('No Significant clusters in ' + folder + '  ' + str(pp) +' (hetero) case')
+			print_status('No Significant clusters in ' + roi + '  ' + str(pp) +' (hetero) case')
 			slope_sig2=np.zeros(sig2.shape[0])
 		
 
 		res=np.column_stack((slope_sig1,slope_sig2))
-		np.savetxt(os.path.join('/media/olive/Research/oliver/pop_slopes/',paradigm,folder+'_'+str(pp)+'.csv'),res,delimiter=',')
+		np.savetxt(os.path.join('/media/olive/Research/oliver/pop_slopes/',paradigm,roi+'_'+str(pp)+'.csv'),res,delimiter=',')
 
 		# permuation clustering for homo-hetero
 		T_obs, clusters, cluster_p_values, H0 = permutation_cluster_1samp_test(sig1-sig2,
@@ -760,7 +760,7 @@ for roi in ROIs_hetero:  # for each roi
 				p=p+1
 			else:
 				p=p+1 
-                
+				
 		if len(clus):
 			sig_tt=tt[np.concatenate(clus)]  # Significant time points
 			ax.plot(sig_tt,np.repeat(diff_sig_passive,len(sig_tt)),'k--', linewidth=lwd) 
@@ -781,7 +781,7 @@ for roi in ROIs_hetero:  # for each roi
 		
 		fig.tight_layout(pad=2)   
 		#plt.show() 
-		save_file_name=paradigm + '_' + folder + '_'+str(pp)+'.png'
+		save_file_name='Combined_' + roi + '_'+str(pp)+'.png'
 		fig.savefig(os.path.join(decoding_res_fig_path,save_file_name),dpi=300) 
 		os.chdir('..')
 		
@@ -789,30 +789,30 @@ for roi in ROIs_hetero:  # for each roi
 # montaging (this will work only if your system is Linux and montage installed))
 if is_montage_installed():
 	os.chdir(decoding_res_fig_path)
-	create_dir('montages')
-
+	create_dir('montages') 
+    
 	fname='montages/Task_V1_45.png' 
-	status=os.system('montage task_V1_45_0.png task_V1_45_10.png task_V1_45_20.png task_V1_45_40.png task_V1_45_60.png  task_V1_45_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
+	status=os.system('montage Combined_V1_45_0.png Combined_V1_45_10.png Combined_V1_45_20.png Combined_V1_45_40.png Combined_V1_45_60.png  Combined_V1_45_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
 
 	fname='montages/Task_V1_90.png' 
-	status=os.system('montage task_V1_90_0.png task_V1_90_10.png task_V1_90_20.png task_V1_90_40.png task_V1_90_60.png  task_V1_90_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
+	status=os.system('montage Combined_V1_90_0.png Combined_V1_90_10.png Combined_V1_90_20.png Combined_V1_90_40.png Combined_V1_90_60.png  Combined_V1_90_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
 
 	fname='montages/Task_V1_135.png' 
-	status=os.system('montage task_V1_135_0.png task_V1_135_10.png task_V1_135_20.png task_V1_135_40.png task_V1_135_60.png  task_V1_135_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
+	status=os.system('montage Combined_V1_135_0.png Combined_V1_135_10.png Combined_V1_135_20.png Combined_V1_135_40.png Combined_V1_135_60.png  Combined_V1_135_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
 			
 	fname='montages/Task_PPC_45.png' 
-	status=os.system('montage task_PPC_45_0.png task_PPC_45_10.png task_PPC_45_20.png task_PPC_45_40.png task_PPC_45_60.png  task_PPC_45_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
+	status=os.system('montage Combined_PPC_45_0.png Combined_PPC_45_10.png Combined_PPC_45_20.png Combined_PPC_45_40.png Combined_PPC_45_60.png  Combined_PPC_45_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
 
 	fname='montages/Task_PPC_90.png' 
-	status=os.system('montage task_PPC_90_0.png task_PPC_90_10.png task_PPC_90_20.png task_PPC_90_40.png task_PPC_90_60.png  task_PPC_90_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
+	status=os.system('montage Combined_PPC_90_0.png Combined_PPC_90_10.png Combined_PPC_90_20.png Combined_PPC_90_40.png Combined_PPC_90_60.png  Combined_PPC_90_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
 
 	fname='montages/Task_PPC_135.png' 
-	status=os.system('montage task_PPC_135_0.png task_PPC_135_10.png task_PPC_135_20.png task_PPC_135_40.png task_PPC_135_60.png  task_PPC_135_100.png   -tile 6x1  -geometry +1+1 ' + fname)
+	status=os.system('montage Combined_PPC_135_0.png Combined_PPC_135_10.png Combined_PPC_135_20.png Combined_PPC_135_40.png Combined_PPC_135_60.png  Combined_PPC_135_100.png   -tile 6x1  -geometry +1+1 ' + fname)
 else:
 	print_status('Montage NOT installed in your computer. Skipping...') 
 
   
-    
+	
 """ 
 # Plotting and montaging for one condition (as in the First submission)
 ## Plotting the results (task as solid  line and passive as dashed line)
