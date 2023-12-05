@@ -156,3 +156,27 @@ print("Preffered  homo: ", get_preference(homo_data_p[idx,:,:],homo_labels )[0])
  
 plt.plot(get_tuning_curve(hetero_data_p[idx,:,:],hetero_labels))
 print("Preffered hetero: ", get_preference(hetero_data_p[idx,:,:],hetero_labels))
+
+
+
+ 
+			
+"""				
+A=np.load('/media/olive/Research/oliver/IEMdecodingForCalciumData/pop_decoding/tuning_curves/task/V1_135/100/Mouse3.npy')
+
+B=zero_center_the_tcs(A,shift=wrap_around)
+
+plt.imshow(B[:,0,:],cmap='jet',extent=(0,120,0,50))
+plt.show()
+ 
+plt.imshow(B[:,1,:],cmap='jet',extent=(0,120,0,50))
+plt.show()
+
+plt.imshow(C[:,:,0],cmap='jet',extent=(0,120,0,50))
+plt.show()
+ 
+plt.imshow(C[:,:,1],cmap='jet',extent=(0,120,0,50))
+plt.show()
+"""
+
+0-Blue, 1-Orange, 2- Green, 3-  Firebrick 4 -Purple 5- Rosy Brown 6- Orchid 7- Gray
