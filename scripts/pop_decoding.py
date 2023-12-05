@@ -962,3 +962,12 @@ else:
 	print_status('Montage NOT installed in your computer. Skipping...') 
 
 """	 
+
+# 1. once you receive the p-value; put them in the folder and tun the R file PrefDirection.R to get the csv files iused for decoding;
+# Make sure to names are in the format as in task
+
+# 2. Run the decoding with task off (only passive decoding)
+
+# 3. Check the plots
+
+# $ Check the sslope summary plots in SlopesSummary.R
