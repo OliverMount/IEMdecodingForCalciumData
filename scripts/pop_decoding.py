@@ -626,12 +626,12 @@ for roi in ROIs_hetero:  # for each roi
 			slope_sig1=np.mean(A_task[:,clus,0],1)
 			sig_tt=sig_tt[sig_tt<=4.05]  
 		else:
-            cluster_p_values=1
+			cluster_p_values=1
 			sig_tt=[None,None]
 			print_status('No Significant clusters in ' + roi  + '  ' + str(pp) +' (homo) case')
 			slope_sig1=np.zeros(sig1.shape[0])
 			
-		sig_tt_info = {'Paradigm': paradigm  ,'Roi': roi, 'Condition': 'homo' , 'Percentage': pp ,'Cluster p-value': np.min(cluster_p_values) ,'Significant time points' :  [np.round(sig_tt[0],4),np.round(sig_tt[-1],4)]}
+		sig_tt_info = {'Paradigm': paradigm  ,'Roi': roi, 'Condition': 'homo' , 'Percentage': pp ,'Cluster p-value': np.min(cluster_p_values) ,'Significant time points' :  [sig_tt[0],sig_tt[-1]]}
 		df.loc[len(df)] = sig_tt_info
 		
 		#print('Slope sig 1', slope_sig1)
@@ -660,12 +660,12 @@ for roi in ROIs_hetero:  # for each roi
 			sig_tt=sig_tt[sig_tt<=4.05] 
 		
 		else:
-            cluster_p_values=1
+			cluster_p_values=1
 			sig_tt=[None,None]
 			print_status('No Significant clusters in ' + roi + '  ' + str(pp) +' (hetero) case')
 			slope_sig2=np.zeros(sig2.shape[0])
 		
-		sig_tt_info = {'Paradigm': paradigm  ,'Roi': roi, 'Condition': 'hetero' , 'Percentage': pp ,'Cluster p-value': np.min(cluster_p_values) ,'Significant time points' :  [np.round(sig_tt[0],4),np.round(sig_tt[-1],4)]}
+		sig_tt_info = {'Paradigm': paradigm  ,'Roi': roi, 'Condition': 'hetero' , 'Percentage': pp ,'Cluster p-value': np.min(cluster_p_values) ,'Significant time points' :  [sig_tt[0],sig_tt[-1]]}
 		df.loc[len(df)] = sig_tt_info
 		
 
@@ -690,10 +690,10 @@ for roi in ROIs_hetero:  # for each roi
 			ax.plot(sig_tt,np.repeat(diff_sig_task,len(sig_tt)),'k-', linewidth=lwd) 
 			sig_tt=sig_tt[sig_tt<=4.05]
 		else:
-            cluster_p_values=1
+			cluster_p_values=1
 			sig_tt=[None,None]
 			
-		sig_tt_info = {'Paradigm': paradigm  ,'Roi': roi, 'Condition': 'diff' , 'Percentage': pp ,'Cluster p-value': np.min(cluster_p_values) ,'Significant time points' :  [np.round(sig_tt[0],4),np.round(sig_tt[-1],4)]}
+		sig_tt_info = {'Paradigm': paradigm  ,'Roi': roi, 'Condition': 'diff' , 'Percentage': pp ,'Cluster p-value': np.min(cluster_p_values) ,'Significant time points' :  [sig_tt[0],sig_tt[-1]]}
 		df.loc[len(df)] = sig_tt_info
 		
 			
@@ -735,12 +735,12 @@ for roi in ROIs_hetero:  # for each roi
 			slope_sig1=np.mean(A_passive[:,clus,0],1)	
 			sig_tt=sig_tt[sig_tt<=4.05] 
 		else:
-            cluster_p_values=1
+			cluster_p_values=1
 			sig_tt=[None,None]
 			print_status('No Significant clusters in ' + roi + '  ' + str(pp) +' (homo) case')
 			slope_sig1=np.zeros(sig1.shape[0])
 		
-		sig_tt_info = {'Paradigm': paradigm  ,'Roi': roi, 'Condition': 'homo' , 'Percentage': pp ,'Cluster p-value': np.min(cluster_p_values) ,'Significant time points' :  [np.round(sig_tt[0],4),np.round(sig_tt[-1],4)]}
+		sig_tt_info = {'Paradigm': paradigm  ,'Roi': roi, 'Condition': 'homo' , 'Percentage': pp ,'Cluster p-value': np.min(cluster_p_values) ,'Significant time points' :  [sig_tt[0],sig_tt[-1],4)]}
 		df.loc[len(df)] = sig_tt_info
 		
 		
@@ -770,13 +770,13 @@ for roi in ROIs_hetero:  # for each roi
 			slope_sig2=np.mean(A_passive[:,clus,1],1)
 			sig_tt=sig_tt[sig_tt<=4.05] 
 		else:
-            cluster_p_values=1
+			cluster_p_values=1
 			sig_tt=[None,None]
 			print_status('No Significant clusters in ' + roi + '  ' + str(pp) +' (hetero) case')
 			slope_sig2=np.zeros(sig2.shape[0])
 		
 		
-		sig_tt_info = {'Paradigm': paradigm  ,'Roi': roi, 'Condition': 'hetero' , 'Percentage': pp ,'Cluster p-value': np.min(cluster_p_values) ,'Significant time points' :  [np.round(sig_tt[0],4),np.round(sig_tt[-1],4)]}
+		sig_tt_info = {'Paradigm': paradigm  ,'Roi': roi, 'Condition': 'hetero' , 'Percentage': pp ,'Cluster p-value': np.min(cluster_p_values) ,'Significant time points' :  [sig_tt[0],sig_tt[-1]]}
 		df.loc[len(df)] = sig_tt_info
 		
 
@@ -801,10 +801,10 @@ for roi in ROIs_hetero:  # for each roi
 			ax.plot(sig_tt,np.repeat(diff_sig_passive,len(sig_tt)),'k--', linewidth=lwd) 
 			sig_tt=sig_tt[sig_tt<=4.05] 
 		else:
-            cluster_p_values=1
+			cluster_p_values=1
 			sig_tt=[None,None]
 			
-		sig_tt_info = {'Paradigm': paradigm  ,'Roi': roi, 'Condition': 'diff' , 'Percentage': pp ,'Cluster p-value': np.min(cluster_p_values) ,'Significant time points' :  [np.round(sig_tt[0],4),np.round(sig_tt[-1],4)]}
+		sig_tt_info = {'Paradigm': paradigm  ,'Roi': roi, 'Condition': 'diff' , 'Percentage': pp ,'Cluster p-value': np.min(cluster_p_values) ,'Significant time points' :  [sig_tt[0],sig_tt[-1]]}
 		df.loc[len(df)] = sig_tt_info
 		
 		
