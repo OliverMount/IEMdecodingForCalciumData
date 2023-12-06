@@ -615,21 +615,28 @@ for roi in ROIs_hetero:  # for each roi
 				clus.extend(clusters[p])
 				p=p+1
 			else:
-				p=p+1  
-				
-		clus=np.concatenate(clus)
-		clus=clus[(clus>20) & (clus<100)] 
+				p=p+1   
+	 
 		
-		if len(clus):  
-			sig_tt=tt[clus]  # Significant time points
-			ax.plot(sig_tt,np.repeat(first_sig_task,len(sig_tt)),'r-', linewidth=lwd) 
-			slope_sig1=np.mean(A_task[:,clus,0],1)
-			sig_tt=sig_tt[sig_tt<=4.05]  
+		if len(clus):    
+            clus=np.concatenate(clus)
+    		clus=clus[(clus>20) & (clus<101)] 
+            
+            if len(clus): 
+    			sig_tt=tt[clus]  # Significant time points
+    			ax.plot(sig_tt,np.repeat(first_sig_task,len(sig_tt)),'r-', linewidth=lwd) 
+    			slope_sig1=np.mean(A_task[:,clus,0],1)  
+            else:
+                cluster_p_values=1
+    			sig_tt=[None,None]
+    			print_status('No Significant clusters in ' + roi  + '  ' + str(pp) +' (homo) case')
+    			slope_sig1=np.zeros_like(sig1)
+                
 		else:
 			cluster_p_values=1
 			sig_tt=[None,None]
 			print_status('No Significant clusters in ' + roi  + '  ' + str(pp) +' (homo) case')
-			slope_sig1=np.zeros(sig1.shape[0])
+			slope_sig1=np.zeros_like(sig1)
 			
 		sig_tt_info = {'Paradigm': paradigm  ,'Roi': roi, 'Condition': 'homo' , 'Percentage': pp ,'Cluster p-value': np.min(cluster_p_values) ,'Significant time points' :  [sig_tt[0],sig_tt[-1]]}
 		df.loc[len(df)] = sig_tt_info
@@ -649,10 +656,12 @@ for roi in ROIs_hetero:  # for each roi
 			else:
 				p=p+1 
 		
-		clus=np.concatenate(clus)
-		clus=clus[(clus>20) & (clus<100)] 
+	 
 				
 		if len(clus): 
+            clus=np.concatenate(clus)
+    		clus=clus[(clus>20)] 
+            
 			sig_tt=tt[clus]  # Significant time points
 			ax.plot(sig_tt,np.repeat(second_sig_task,len(sig_tt)),'b-', linewidth=lwd) 
 			slope_sig2=np.mean(A_task[:,clus,1],1)
@@ -682,15 +691,15 @@ for roi in ROIs_hetero:  # for each roi
 				clus.extend(clusters[p])
 				p=p+1
 			else:
-				p=p+1 
-		
-		clus=np.concatenate(clus)
-		clus=clus[(clus>20) & (clus<100)] 
+				p=p+1  
+ 
 				
-		if len(clus):
+		if len(clus): 
+            clus=np.concatenate(clus)
+    		clus=clus[clus>20] 
 			sig_tt=tt[clus]  # Significant time points
 			ax.plot(sig_tt,np.repeat(diff_sig_task,len(sig_tt)),'k-', linewidth=lwd) 
-			sig_tt=sig_tt[sig_tt<=4.05]
+			#sig_tt=sig_tt[sig_tt<=4.05]
 		else:
 			cluster_p_values=1
 			sig_tt=[None,None]
@@ -705,6 +714,7 @@ for roi in ROIs_hetero:  # for each roi
 		
 		sig1=A_passive[:,:,0]  # homo  # no. mouse X no. time points X (homo or hetero)
 		sig2=A_passive[:,:,1]  # hetero	
+ 
 		 
 		# plot the mean and error bar
 		ax.plot(tt,np.mean(sig1,0),'r--',tt,np.mean(sig2,0),'b--',linewidth=plt_lwd) 
@@ -727,10 +737,13 @@ for roi in ROIs_hetero:  # for each roi
 			else:
 				p=p+1 
 				
-		clus=np.concatenate(clus)
-		clus=clus[(clus>20) & (clus<100)] 
+		
 
 		if len(clus): 
+            
+            clus=np.concatenate(clus)
+    		clus=clus[(clus>20) & (clus<100)] 
+            
 			sig_tt=tt[clus]  # Significant time points
 			ax.plot(sig_tt,np.repeat(first_sig_passive,len(sig_tt)),'r--', linewidth=lwd) 
 			slope_sig1=np.mean(A_passive[:,clus,0],1)	
