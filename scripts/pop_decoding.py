@@ -1136,8 +1136,7 @@ for cond in conds:
 	save_file_name='Summary_' + cond.replace(' ','_') +'.png'
 	fig.savefig(os.path.join(decoding_res_fig_path,save_file_name),dpi=300)  
 
-# Montage the files
- 
+# Montage the summary files 
 if is_montage_installed():
 	os.chdir(decoding_res_fig_path)
 	create_dir('montages') 
