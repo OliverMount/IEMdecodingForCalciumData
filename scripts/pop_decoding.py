@@ -136,7 +136,7 @@ percent_data=[0,10,20,40,60,100]
 #########################################################################################
 ############################  ANALYSIS FOR TASK DATA #####################################
 #########################################################################################
-
+ 
 paradigm='task' 
 # mouse name order
 V1_task=['1R.mat','2L.mat','newV1.mat','Ylbd.mat','Ylbe.mat','Ylbf.mat','Ylbg.mat','2.mat',	'3.mat','4.mat']
@@ -354,10 +354,10 @@ for roi in ROIs_hetero:   # For each condition
 			else:
 				print_status('Already done with slope computations') 
 				
-		np.save(fname,slopes)  
-		
+		np.save(fname,slopes)   
 		
 ############## passive data decoding   ################## 
+ 
 
 paradigm='passive' 
 # mouse name order
@@ -620,7 +620,7 @@ for roi in ROIs_hetero:  # for each roi
 			
 			sig_tt=tt[clus]  # Significant time points
 			ax.plot(sig_tt,np.repeat(first_sig_task,len(sig_tt)),'r-', linewidth=lwd) 
-			slope_sig1=np.mean(A[:,clus,0],1)	
+			slope_sig1=np.mean(A_task[:,clus,0],1)	
 		else:
 			print_status('No Significant clusters in ' + roi  + '  ' + str(pp) +' (homo) case')
 			slope_sig1=np.zeros(sig1.shape[0])
@@ -648,7 +648,7 @@ for roi in ROIs_hetero:  # for each roi
 			sig_tt=tt[clus]  # Significant time points
 			ax.plot(sig_tt,np.repeat(second_sig_task,len(sig_tt)),'b-', linewidth=lwd) 
 		
-			slope_sig2=np.mean(A[:,clus,1],1)
+			slope_sig2=np.mean(A_task[:,clus,1],1)
 		else:
 			print_status('No Significant clusters in ' + roi + '  ' + str(pp) +' (hetero) case')
 			slope_sig2=np.zeros(sig2.shape[0])
@@ -680,9 +680,8 @@ for roi in ROIs_hetero:  # for each roi
 		A_passive=np.load(os.path.join(decoding_res_slopes_path,paradigm,roi,str(pp),'slopes.npy'))
 		
 		sig1=A_passive[:,:,0]  # homo  # no. mouse X no. time points X (homo or hetero)
-		sig2=A_passive[:,:,1]  # hetero   
-		
-		fig, ax = plt.subplots(1,1,figsize=(7,7))	
+		sig2=A_passive[:,:,1]  # hetero    
+		 
 		# plot the mean and error bar
 		ax.plot(tt,np.mean(sig1,0),'r--',tt,np.mean(sig2,0),'b--',linewidth=plt_lwd) 
 		ax.fill_between(tt,np.mean(sig1,0)- (np.std(sig1,0)/np.sqrt(sig1.shape[0])),  
@@ -711,7 +710,7 @@ for roi in ROIs_hetero:  # for each roi
 			
 			sig_tt=tt[clus]  # Significant time points
 			ax.plot(sig_tt,np.repeat(first_sig_passive,len(sig_tt)),'r--', linewidth=lwd) 
-			slope_sig1=np.mean(A[:,clus,0],1)	
+			slope_sig1=np.mean(A_passive[:,clus,0],1)	
 		else:
 			print_status('No Significant clusters in ' + roi + '  ' + str(pp) +' (homo) case')
 			slope_sig1=np.zeros(sig1.shape[0])
@@ -739,7 +738,7 @@ for roi in ROIs_hetero:  # for each roi
 			sig_tt=tt[clus]  # Significant time points
 			ax.plot(sig_tt,np.repeat(second_sig_passive,len(sig_tt)),'b--', linewidth=lwd) 
 		
-			slope_sig2=np.mean(A[:,clus,1],1)
+			slope_sig2=np.mean(A_passive[:,clus,1],1)
 		else:
 			print_status('No Significant clusters in ' + roi + '  ' + str(pp) +' (hetero) case')
 			slope_sig2=np.zeros(sig2.shape[0])
@@ -970,4 +969,4 @@ else:
 
 # 3. Check the plots
 
-# $ Check the sslope summary plots in SlopesSummary.R
+# 4. Check the sslope summary plots in SlopesSummary.R

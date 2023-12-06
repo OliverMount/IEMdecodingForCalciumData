@@ -94,10 +94,10 @@ for (cond in conds){   # for each condition
   
   # loading the p-value file
   B<- readMat(cond)
-  B$homo<- Filter(Negate(is.null), B$homo)
-  B$hetero<- Filter(Negate(is.null),B$hetero)
+  B$pVal.homo<- Filter(Negate(is.null), B$pVal.homo)
+  B$pVal.hetero<- Filter(Negate(is.null),B$pVal.hetero)
   
-  L<- length(B$homo)  # No. of animals here
+  L<- length(B$pVal.homo)  # No. of animals here
   
   df<-data.frame(Sub=rep(NA,1),
                  Condition=rep(NA,1),
@@ -108,8 +108,8 @@ for (cond in conds){   # for each condition
   for (k in 1:L){  # for each animal   
     
     
-    ho_p<-as.numeric(unlist(B$homo[[k]]))
-    he_p<-as.numeric(unlist(B$hetero[[k]]))
+    ho_p<-as.numeric(unlist(B$pVal.homo[[k]]))
+    he_p<-as.numeric(unlist(B$pVal.hetero[[k]]))
     
     homo<- rep(0,length(ho_p))
     hetero<-  rep(0,length(he_p))

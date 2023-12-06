@@ -123,10 +123,45 @@ Np<- nrow(mean_data_passive)
 
 temp<-data.frame(Paradigm=rep(c("Task","Passive"),each=c(Nt))) 
 final<- cbind(temp,mean_data)
+final$Paradigm<- factor(final$Paradigm,levels=c("Task","Passive"),ordered = TRUE)
 
 
 # may be PPC and V1 has to be plotted separately
+# Plot using ggplot
+p <- ggplot(final, aes(x = Percent, y = mean_value, 
+                       group=interaction(variable, Paradigm), color = variable,
+                       linetype=Paradigm)) +
+  geom_line()+
+  geom_point()+
+  geom_errorbar(aes(ymin=mean_value-se_value, ymax=mean_value+se_value), width=.2,
+                position=position_dodge(0.05))+
+  #geom_point(data=mean_data,aes(x=variable,y=mean_value,fill = Percent))+
+  #geom_boxplot(position = "dodge", outlier.color = "red", outlier.shape = NA) +
+  #stat_summary(fun = mean, geom = 'point', shape = 23, size = 3,
+  #             color = "black", fill = "magenta", alpha = 0.7, position = position_dodge(width = 0.75)) +
+  #geom_pointrange(data = mean_data, aes(x = variable, y = mean_value, ymin = mean_value - se_value, ymax = mean_value + se_value))+
+  #geom_point(data = mean_data, aes(x = variable, y = mean_value, ymin = mean_value - se_value, ymax = mean_value + se_value),
+  #              position = position_dodge(width = 0.75), width = 0.2, color = "black") +
+  theme_classic() +
+  theme(legend.position = "top",
+        axis.ticks.length.x = unit(3, 'mm'),
+        axis.ticks.length.y = unit(3, 'mm'),
+        axis.text = element_text(size = 20),
+        axis.title.x = element_text(size = 24),
+        axis.title.y = element_text(size = 24),
+        plot.title = element_text(size = 24, hjust = 0.5),
+        legend.title = element_blank(),
+        legend.text = element_text(size=24),
+        strip.text.x = element_text(size = 24)) +
+  facet_wrap(~Condition, scales = "free_y") +
+  labs(x = "Percentage of untuned cells added", y = "Average slope") +
+  scale_y_continuous(breaks = seq(0, 0.28, 0.05), limits = c(-0.001, 0.28),
+                     expand = c(0, 0))+
+  scale_color_manual(values = my_colors)+
+  scale_linetype_manual(values=c("solid","dashed"))
 
+# Print the plot
+print(p) 
 
 
  
