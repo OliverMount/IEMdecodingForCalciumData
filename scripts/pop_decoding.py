@@ -1074,15 +1074,14 @@ else:
 
 """	 
 
-# 1. once you receive the p-value; put them in the folder and tun the R file PrefDirection.R to get the csv files iused for decoding;
+# 1. once you receive the p-value; put them in the folder and run the R file PrefDirection.R to get the csv files iused for decoding;
 # Make sure to names are in the format as in task 
 # 2. Run the decoding with task off (only passive decoding) 
 # 3. Check the plots 
 # 4. Check the sslope summary plots in SlopesSummary.R
 
 
-# Plot the summary of the slopes
-
+# Plot the summary of the slopes 
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -1145,4 +1144,4 @@ if is_montage_installed():
 	status=os.system('montage Summary_V1_45.png  Summary_V1_90.png  Summary_V1_135.png -tile 3x1  -geometry +1+1 ' + fname) 
  
 	fname='montages/Summary_PPC.png'
-	status=os.system('montage Summary_PPC_45.png  Summary_PPC_90.png  Summary_PPC_135.png -tile 3x1  -geometry +1+1 ' + fname) 
+	status=os.system('montage Summary_PPC_45.png  Summary_PPC_90.png  Summary_PPC_135.png -tile 3x1  -geometry +1+1 ' + fname)  
