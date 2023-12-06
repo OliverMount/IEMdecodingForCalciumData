@@ -2,7 +2,7 @@
 
 # Combining all the csv files that contains average slopes across
 # significant time points in to a single file. The csv files are made during plotting
-# in the pop_decoding.py  
+# in the pop_decoding.py. Also, the slope summaries are plotted in the python pop_decoding.py file at the end
 
 rm(list = ls())
 library(R.matlab)
@@ -10,8 +10,7 @@ library(pracma)
 library(tidyverse)
 library(gridExtra)
 library(reshape2)
-library(ggpubr)
-
+library(ggpubr) 
 
 save_path='/media/olive/Research/oliver/IEMdecodingForCalciumData/neuron_counts/' 
 setwd('/media/olive/Research/oliver/pop_slopes/task')

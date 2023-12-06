@@ -874,8 +874,8 @@ for roi in ROIs_hetero:  # for each roi
 		save_file_name='Combined_' + roi + '_'+str(pp)+'.png'
 		fig.savefig(os.path.join(decoding_res_fig_path,save_file_name),dpi=300) 
 		os.chdir('..') 
-        
-        
+		
+		
 df.to_excel("/media/olive/Research/oliver/IEMdecodingForCalciumData/neuron_counts/Significant.xlsx", index=False)
 		
 # montaging (this will work only if your system is Linux and montage installed))
@@ -1137,11 +1137,13 @@ for cond in conds:
 	fig.savefig(os.path.join(decoding_res_fig_path,save_file_name),dpi=300)  
 
 # Montage the files
-"""
+ 
 if is_montage_installed():
 	os.chdir(decoding_res_fig_path)
 	create_dir('montages') 
 	
 	fname='montages/Summary_V1.png'
 	status=os.system('montage Summary_V1_45.png  Summary_V1_90.png  Summary_V1_135.png -tile 3x1  -geometry +1+1 ' + fname) 
-"""
+ 
+	fname='montages/Summary_PPC.png'
+	status=os.system('montage Summary_PPC_45.png  Summary_PPC_90.png  Summary_PPC_135.png -tile 3x1  -geometry +1+1 ' + fname) 
