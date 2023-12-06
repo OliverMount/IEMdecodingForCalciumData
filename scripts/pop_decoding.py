@@ -663,6 +663,9 @@ for roi in ROIs_hetero:  # for each roi
 			print_status('No Significant clusters in ' + roi + '  ' + str(pp) +' (hetero) case')
 			slope_sig2=np.zeros(sig2.shape[0])
 		
+		sig_tt_info = {'Paradigm': paradigm  ,'Roi': roi, 'Condition': 'hetero' , 'Percentage': pp ,'Cluster p-value': np.min(cluster_p_values) ,'Significant time points' :  [np.round(sig_tt[0],4),np.round(sig_tt[-1],4)]}
+		df.loc[len(df)] = sig_tt_info
+		
 
 		res=np.column_stack((slope_sig1,slope_sig2))
 		np.savetxt(os.path.join('/media/olive/Research/oliver/pop_slopes/',paradigm,roi+'_'+str(pp)+'.csv'),res,delimiter=',')
@@ -686,6 +689,10 @@ for roi in ROIs_hetero:  # for each roi
 			sig_tt=sig_tt[sig_tt<=4.05]
 		else:
 			sig_tt=[None,None]
+			
+		sig_tt_info = {'Paradigm': paradigm  ,'Roi': roi, 'Condition': 'diff' , 'Percentage': pp ,'Cluster p-value': np.min(cluster_p_values) ,'Significant time points' :  [np.round(sig_tt[0],4),np.round(sig_tt[-1],4)]}
+		df.loc[len(df)] = sig_tt_info
+		
 			
 		## plotting for passive 
 		paradigm='passive'
@@ -729,6 +736,10 @@ for roi in ROIs_hetero:  # for each roi
 			print_status('No Significant clusters in ' + roi + '  ' + str(pp) +' (homo) case')
 			slope_sig1=np.zeros(sig1.shape[0])
 		
+		sig_tt_info = {'Paradigm': paradigm  ,'Roi': roi, 'Condition': 'homo' , 'Percentage': pp ,'Cluster p-value': np.min(cluster_p_values) ,'Significant time points' :  [np.round(sig_tt[0],4),np.round(sig_tt[-1],4)]}
+		df.loc[len(df)] = sig_tt_info
+		
+		
 		#print('Slope sig 1', slope_sig1)
 		# permutation clustering for hetero
 		T_obs, clusters, cluster_p_values, H0 = permutation_cluster_1samp_test(sig2,
@@ -759,6 +770,10 @@ for roi in ROIs_hetero:  # for each roi
 			print_status('No Significant clusters in ' + roi + '  ' + str(pp) +' (hetero) case')
 			slope_sig2=np.zeros(sig2.shape[0])
 		
+		
+		sig_tt_info = {'Paradigm': paradigm  ,'Roi': roi, 'Condition': 'hetero' , 'Percentage': pp ,'Cluster p-value': np.min(cluster_p_values) ,'Significant time points' :  [np.round(sig_tt[0],4),np.round(sig_tt[-1],4)]}
+		df.loc[len(df)] = sig_tt_info
+		
 
 		res=np.column_stack((slope_sig1,slope_sig2))
 		np.savetxt(os.path.join('/media/olive/Research/oliver/pop_slopes/',paradigm,roi+'_'+str(pp)+'.csv'),res,delimiter=',')
@@ -782,6 +797,10 @@ for roi in ROIs_hetero:  # for each roi
 			sig_tt=sig_tt[sig_tt<=4.05] 
 		else:
 			sig_tt=[None,None]
+			
+		sig_tt_info = {'Paradigm': paradigm  ,'Roi': roi, 'Condition': 'diff' , 'Percentage': pp ,'Cluster p-value': np.min(cluster_p_values) ,'Significant time points' :  [np.round(sig_tt[0],4),np.round(sig_tt[-1],4)]}
+		df.loc[len(df)] = sig_tt_info
+		
 		
 		ax.set_xticks([0, 1,2,3,4,5]) 
 		ax.set_yticks(np.arange(-0.2,ymax+0.01,0.1)) 
