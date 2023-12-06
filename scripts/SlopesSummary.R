@@ -162,8 +162,6 @@ p <- ggplot(final, aes(x = Percent, y = mean_value,
 
 # Print the plot
 print(p) 
-
-
  
 
 ### IEM decoding

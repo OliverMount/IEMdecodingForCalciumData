@@ -680,7 +680,7 @@ for roi in ROIs_hetero:  # for each roi
 		A_passive=np.load(os.path.join(decoding_res_slopes_path,paradigm,roi,str(pp),'slopes.npy'))
 		
 		sig1=A_passive[:,:,0]  # homo  # no. mouse X no. time points X (homo or hetero)
-		sig2=A_passive[:,:,1]  # hetero    
+		sig2=A_passive[:,:,1]  # hetero	
 		 
 		# plot the mean and error bar
 		ax.plot(tt,np.mean(sig1,0),'r--',tt,np.mean(sig2,0),'b--',linewidth=plt_lwd) 
@@ -788,7 +788,14 @@ for roi in ROIs_hetero:  # for each roi
 if is_montage_installed():
 	os.chdir(decoding_res_fig_path)
 	create_dir('montages') 
-    
+	
+	fname='montages/V1_vert.png'
+	status=os.system('montage Combined_V1_45_0.png Combined_V1_90_0.png Combined_V1_135_0.png Combined_V1_45_10.png  Combined_V1_90_10.png Combined_V1_135_10.png   Combined_V1_45_20.png  Combined_V1_90_20.png Combined_V1_135_20.png Combined_V1_45_40.png  Combined_V1_90_40.png Combined_V1_135_40.png  Combined_V1_45_60.png  Combined_V1_90_60.png Combined_V1_135_60.png  Combined_V1_45_100.png  Combined_V1_90_100.png Combined_V1_135_100.png -tile 3x6  -geometry +1+1 ' + fname) 
+ 
+	fname='montages/PPC_vert.png'
+	status=os.system('montage Combined_PPC_45_0.png Combined_PPC_90_0.png Combined_PPC_135_0.png Combined_PPC_45_10.png  Combined_PPC_90_10.png Combined_PPC_135_10.png   Combined_PPC_45_20.png  Combined_PPC_90_20.png Combined_PPC_135_20.png Combined_PPC_45_40.png  Combined_PPC_90_40.png Combined_PPC_135_40.png  Combined_PPC_45_60.png  Combined_PPC_90_60.png Combined_PPC_135_60.png  Combined_PPC_45_100.png  Combined_PPC_90_100.png Combined_PPC_135_100.png -tile 3x6  -geometry +1+1 ' + fname) 
+
+	
 	fname='montages/V1_45.png' 
 	status=os.system('montage Combined_V1_45_0.png Combined_V1_45_10.png Combined_V1_45_20.png Combined_V1_45_40.png Combined_V1_45_60.png  Combined_V1_45_100.png   -tile 6x1  -geometry +1+1 ' + fname) 
 
@@ -806,6 +813,17 @@ if is_montage_installed():
 
 	fname='montages/PPC_135.png' 
 	status=os.system('montage Combined_PPC_135_0.png Combined_PPC_135_10.png Combined_PPC_135_20.png Combined_PPC_135_40.png Combined_PPC_135_60.png  Combined_PPC_135_100.png   -tile 6x1  -geometry +1+1 ' + fname)
+
+	
+	os.chdir('montages')
+	
+	fname='V1_hori.png'
+	status=os.system('montage V1_45.png  V1_90.png  V1_135.png  -tile 1x3  -geometry +1+1 ' + fname)
+
+	fname='PPC_hori.png'
+	status=os.system('montage PPC_45.png  PPC_90.png  PPC_135.png  -tile 1x3  -geometry +1+1 ' + fname)
+
+
 else:
 	print_status('Montage NOT installed in your computer. Skipping...') 
  
@@ -970,3 +988,59 @@ else:
 # 3. Check the plots
 
 # 4. Check the sslope summary plots in SlopesSummary.R
+
+
+# Plot the summary of the slopes
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+final=pd.read_csv("/media/olive/Research/oliver/IEMdecodingForCalciumData/neuron_counts/final.csv")
+conds=list(np.unique(final['Condition'])) 
+
+for cond in conds:
+	df=final[(final['Condition'].str.contains(cond))] 
+	
+	df_task_homo=df[(df['Paradigm']=='Task') & (df['variable']=='Homo')]
+	df_task_homo.reset_index(drop=True, inplace=True)
+	df_task_hetero=df[(df['Paradigm']=='Task') & (df['variable']=='Hetero')]
+	df_task_hetero.reset_index(drop=True, inplace=True)
+	df_passive_homo=df[(df['Paradigm']=='Passive') & (df['variable']=='Homo')]
+	df_passive_homo.reset_index(drop=True, inplace=True)
+	df_passive_hetero=df[(df['Paradigm']=='Passive') & (df['variable']=='Hetero')]
+	df_passive_hetero.reset_index(drop=True, inplace=True)
+	
+	fig, ax = plt.subplots(1,1,figsize=(7,7))
+	
+	# Plot lines 
+	ax.plot(df_task_homo['mean_value'],'r-') 
+	ax.plot(df_task_homo['mean_value'],'ro')
+	ax.errorbar([0,1,2,3,4,5],df_task_homo['mean_value'], yerr=df_task_homo['se_value'],
+				fmt='none', capsize=5,color='r')
+	
+	ax.plot(df_passive_homo['mean_value'],'r--') 
+	ax.plot(df_passive_homo['mean_value'],'ro')
+	ax.errorbar([0,1,2,3,4,5],df_passive_homo['mean_value'], yerr=df_passive_homo['se_value'],
+				fmt='none', capsize=5,color='r') 
+	
+	ax.plot(df_task_hetero['mean_value'],'b-') 
+	ax.plot(df_task_hetero['mean_value'],'bo')
+	ax.errorbar([0,1,2,3,4,5],df_task_hetero['mean_value'], yerr=df_task_hetero['se_value'],
+				fmt='none', capsize=5,color='b')
+	
+	ax.plot(df_passive_hetero['mean_value'],'b--') 
+	ax.plot(df_passive_hetero['mean_value'],'bo')
+	ax.errorbar([0,1,2,3,4,5],df_passive_hetero['mean_value'], yerr=df_passive_hetero['se_value'],
+				fmt='none', capsize=5,color='b') 
+ 
+	ax.set_xticks([0, 1,2,3,4,5],["0","10","20","40","60","100"])   
+	ax.spines[['top','right']].set_visible(False) 
+	ax.spines[['bottom','left']].set_linewidth(3) 
+	ax.tick_params(axis='both', which='major', labelsize=24) 
+	ax.set_yticks(np.arange(0, 0.26, 0.1))
+	ax.set_ylim(-0.01, 0.22)
+		
+	fig.tight_layout(pad=2)   
+	#plt.show() 
+	save_file_name='Summary_' + cond.replace(' ','_') +'.png'
+	fig.savefig(os.path.join(decoding_res_fig_path,save_file_name),dpi=300)  
