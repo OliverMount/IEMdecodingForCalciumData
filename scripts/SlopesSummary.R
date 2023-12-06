@@ -1,8 +1,10 @@
-############### PLOTTING SLOPES ############
+############### Plotting  summary of slopes ############
 
-# Combining all the csv files in to a single file
+# Combining all the csv files that contains average slopes across
+# significant time points in to a single file. The csv files are made during plotting
+# in the pop_decoding.py 
 
-#### Population Decoding
+ 
 
 
 rm(list = ls())
