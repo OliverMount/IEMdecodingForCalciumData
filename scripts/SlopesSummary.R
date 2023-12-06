@@ -162,7 +162,7 @@ p <- ggplot(final, aes(x = Percent, y = mean_value,
 
 # Print the plot
 print(p) 
- 
+write.csv(final,file=paste0(save_path,'final.csv')) 
 
 ### IEM decoding
 

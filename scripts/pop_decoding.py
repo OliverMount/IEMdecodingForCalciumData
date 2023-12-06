@@ -581,6 +581,10 @@ for roi in ROIs_hetero:   # For each condition
 #os.chdir(os.path.join(decoding_res_slopes_path,paradigm)) 
 #flist=os.listdir()
 
+
+cols=['Paradigm', 'Roi', 'Condition', 'Percentage', 'Cluster p-value','Significant time points']
+df = pd.DataFrame(columns=cols)
+
 for roi in ROIs_hetero:  # for each roi
 	for pp in percent_data: # for each p-value percentage   
 		
@@ -613,17 +617,21 @@ for roi in ROIs_hetero:  # for each roi
 			else:
 				p=p+1  
 
-		if len(clus):
-			
+		if len(clus): 
 			clus=np.concatenate(clus)
 			clus=clus[clus>20]
 			
 			sig_tt=tt[clus]  # Significant time points
 			ax.plot(sig_tt,np.repeat(first_sig_task,len(sig_tt)),'r-', linewidth=lwd) 
-			slope_sig1=np.mean(A_task[:,clus,0],1)	
+			slope_sig1=np.mean(A_task[:,clus,0],1)
+			sig_tt=sig_tt[sig_tt<=4.05]  
 		else:
+			sig_tt=[None,None]
 			print_status('No Significant clusters in ' + roi  + '  ' + str(pp) +' (homo) case')
 			slope_sig1=np.zeros(sig1.shape[0])
+			
+		sig_tt_info = {'Paradigm': paradigm  ,'Roi': roi, 'Condition': 'homo' , 'Percentage': pp ,'Cluster p-value': np.min(cluster_p_values) ,'Significant time points' :  [np.round(sig_tt[0],4),np.round(sig_tt[-1],4)]}
+		df.loc[len(df)] = sig_tt_info
 		
 		#print('Slope sig 1', slope_sig1)
 		# permutation clustering for hetero
@@ -647,9 +655,11 @@ for roi in ROIs_hetero:  # for each roi
 			
 			sig_tt=tt[clus]  # Significant time points
 			ax.plot(sig_tt,np.repeat(second_sig_task,len(sig_tt)),'b-', linewidth=lwd) 
-		
 			slope_sig2=np.mean(A_task[:,clus,1],1)
+			sig_tt=sig_tt[sig_tt<=4.05] 
+		
 		else:
+			sig_tt=[None,None]
 			print_status('No Significant clusters in ' + roi + '  ' + str(pp) +' (hetero) case')
 			slope_sig2=np.zeros(sig2.shape[0])
 		
@@ -673,7 +683,9 @@ for roi in ROIs_hetero:  # for each roi
 		if len(clus):
 			sig_tt=tt[np.concatenate(clus)]  # Significant time points
 			ax.plot(sig_tt,np.repeat(diff_sig_task,len(sig_tt)),'k-', linewidth=lwd) 
-			
+			sig_tt=sig_tt[sig_tt<=4.05]
+		else:
+			sig_tt=[None,None]
 			
 		## plotting for passive 
 		paradigm='passive'
@@ -711,7 +723,9 @@ for roi in ROIs_hetero:  # for each roi
 			sig_tt=tt[clus]  # Significant time points
 			ax.plot(sig_tt,np.repeat(first_sig_passive,len(sig_tt)),'r--', linewidth=lwd) 
 			slope_sig1=np.mean(A_passive[:,clus,0],1)	
+			sig_tt=sig_tt[sig_tt<=4.05] 
 		else:
+			sig_tt=[None,None]
 			print_status('No Significant clusters in ' + roi + '  ' + str(pp) +' (homo) case')
 			slope_sig1=np.zeros(sig1.shape[0])
 		
@@ -739,7 +753,9 @@ for roi in ROIs_hetero:  # for each roi
 			ax.plot(sig_tt,np.repeat(second_sig_passive,len(sig_tt)),'b--', linewidth=lwd) 
 		
 			slope_sig2=np.mean(A_passive[:,clus,1],1)
+			sig_tt=sig_tt[sig_tt<=4.05] 
 		else:
+			sig_tt=[None,None]
 			print_status('No Significant clusters in ' + roi + '  ' + str(pp) +' (hetero) case')
 			slope_sig2=np.zeros(sig2.shape[0])
 		
@@ -763,7 +779,9 @@ for roi in ROIs_hetero:  # for each roi
 		if len(clus):
 			sig_tt=tt[np.concatenate(clus)]  # Significant time points
 			ax.plot(sig_tt,np.repeat(diff_sig_passive,len(sig_tt)),'k--', linewidth=lwd) 
-		
+			sig_tt=sig_tt[sig_tt<=4.05] 
+		else:
+			sig_tt=[None,None]
 		
 		ax.set_xticks([0, 1,2,3,4,5]) 
 		ax.set_yticks(np.arange(-0.2,ymax+0.01,0.1)) 
@@ -981,12 +999,9 @@ else:
 """	 
 
 # 1. once you receive the p-value; put them in the folder and tun the R file PrefDirection.R to get the csv files iused for decoding;
-# Make sure to names are in the format as in task
-
-# 2. Run the decoding with task off (only passive decoding)
-
-# 3. Check the plots
-
+# Make sure to names are in the format as in task 
+# 2. Run the decoding with task off (only passive decoding) 
+# 3. Check the plots 
 # 4. Check the sslope summary plots in SlopesSummary.R
 
 
@@ -1044,3 +1059,13 @@ for cond in conds:
 	#plt.show() 
 	save_file_name='Summary_' + cond.replace(' ','_') +'.png'
 	fig.savefig(os.path.join(decoding_res_fig_path,save_file_name),dpi=300)  
+
+# Montage the files
+"""
+if is_montage_installed():
+	os.chdir(decoding_res_fig_path)
+	create_dir('montages') 
+	
+	fname='montages/Summary_V1.png'
+	status=os.system('montage Summary_V1_45.png  Summary_V1_90.png  Summary_V1_135.png -tile 3x1  -geometry +1+1 ' + fname) 
+"""
