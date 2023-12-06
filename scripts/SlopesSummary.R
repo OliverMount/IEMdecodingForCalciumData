@@ -2,10 +2,7 @@
 
 # Combining all the csv files that contains average slopes across
 # significant time points in to a single file. The csv files are made during plotting
-# in the pop_decoding.py 
-
- 
-
+# in the pop_decoding.py  
 
 rm(list = ls())
 library(R.matlab)
