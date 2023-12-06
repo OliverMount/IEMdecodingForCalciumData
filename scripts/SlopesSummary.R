@@ -4,6 +4,16 @@
 
 #### Population Decoding
 
+
+rm(list = ls())
+library(R.matlab)
+library(pracma)
+library(tidyverse)
+library(gridExtra)
+library(reshape2)
+library(ggpubr)
+
+
 save_path='/media/olive/Research/oliver/IEMdecodingForCalciumData/neuron_counts/' 
 setwd('/media/olive/Research/oliver/pop_slopes/task')
 flist<-list.files(getwd())
@@ -14,9 +24,7 @@ percents<-c('0','10','20','40','60','100')
 df<-data.frame(Condition=rep(NA,1),Percent=rep(NA,1),Homo=rep(NA,1), Hetero=rep(NA,1))
 
 for (roi in rois){ 
-    for (percent in percents){
-      
-       
+    for (percent in percents){ 
       fname<-paste0(roi,'_',percent,'.csv') 
       temp<-read.csv(fname) 
       colnames(temp)<-c("Homo","Hetero")
