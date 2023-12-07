@@ -1395,3 +1395,131 @@ plt.show()
 fig.savefig("/home/olive/Desktop/Dynamics_hetero.tiff",dpi=300)
 
 os.chdir('/media/olive/Research/oliver/scripts/') 
+
+
+
+
+
+### Conceptual figure making
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Set a seed for reproducibility
+#np.random.seed(42)
+
+# Mean values
+mean_values = np.arange(22.5, 360, 45)
+
+# Number of neruons per stimulus
+num_curves = 2 
+
+fig, ax = plt.subplots(1, figsize=(17, 5))
+
+# Generate and plot Gaussian curves
+colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'orange']
+for idx, mean in enumerate(mean_values):
+    for _ in range(num_curves):
+        # Randomly choose standard deviation in the range (10, 20)
+        std_dev = np.random.uniform(40, 50)
+
+        # Randomly choose peak amplitude in the range (1, 10)
+        peak_amplitude = np.random.uniform(1, 10)
+
+        # Use mean_values directly instead of generating x values
+        x = mean_values
+
+        # Generate Gaussian curve
+        y = peak_amplitude * np.exp(-(x - mean)**2 / (2 * std_dev**2))
+
+        # Plot only the data points at the mean with a smaller and unfilled marker
+        ax.scatter(x, y, color=colors[idx], marker='o', facecolors='none', s=25)
+
+        # Plot the entire curve
+        ax.plot(x, y, color=colors[idx], alpha=0.8,lw=3)
+
+# Set x-axis ticks to show mean values
+ax.set_xticks([])
+
+# Add vertical lines to mark mean values
+for mean in mean_values:
+    ax.axvline(x=mean, color='gray', linestyle='--', alpha=0.5) 
+
+# Set y-axis limits to ensure zero points are clearly visible
+ax.set_ylim(-0.1,10)
+
+# Set labels and title
+#ax.set_xlabel('Mean motion direction')
+#ax.set_ylabel('Tuning curve amplitude (a.u)')
+ax.spines[['top', 'right']].set_visible(False)
+ax.spines[['bottom', 'left']].set_linewidth(3)
+ax.tick_params(axis='both', which='major', left=False, right=False, labelleft=False)
+
+# Show the plot
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Set a seed for reproducibility
+#np.random.seed(42)
+
+# Mean values
+mean_values = np.arange(22.5, 360, 45)
+
+# Number of curves for each mean value
+num_curves = 2
+
+
+fig,ax=plt.subplots(1,figsize=(15,7))
+# Generate and plot Gaussian curves
+colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'orange']
+for idx, mean in enumerate(mean_values):
+    for _ in range(num_curves):
+        # Randomly choose standard deviation in the range (10, 20)
+        std_dev = np.random.uniform(40, 50)
+        
+        # Randomly choose peak amplitude in the range (1, 5)
+        peak_amplitude = np.random.uniform(1, 10)
+        
+        # Generate x values centered around the mean
+        x = np.linspace(mean - 5 * std_dev, mean + 5 * std_dev, 100)
+        
+        # Generate Gaussian curve
+        y = peak_amplitude * np.exp(-(x - mean)**2 / (2 * std_dev**2))
+        
+        # Plot the Gaussian curve with a distinct color for each mean
+        ax.plot(x, y, label=f'Mean: {mean}', color=colors[idx])
+
+# Add vertical lines to mark mean values
+for mean in mean_values:
+    ax.axvline(x=mean, color='gray', linestyle='--', alpha=0.5)
+
+# Set x-axis ticks to show mean values
+#ax.set_xticks(mean_values)
+
+# Set labels and title
+#ax.set_xlabel('Mean motion direction')
+#ax.set_ylabel('Tuning curve amplitude (a.u)') 
+ax.spines[['top','right']].set_visible(False) 
+ax.spines[['bottom','left']].set_linewidth(3) 
+#plt.tick_params(axis='x', which='major', labelsize=18,left=False, right=False, labelleft=False) 
+plt.tick_params(axis='both', which='major', left=False, right=False, labelleft=False)
+
+
+# Show the plot
+plt.show()
+
+
+
+
