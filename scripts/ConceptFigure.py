@@ -64,8 +64,9 @@ ax.spines[['top', 'right']].set_visible(False)
 ax.spines[['bottom', 'left']].set_linewidth(3)
 ax.tick_params(axis='both', which='major', left=False, right=False, labelleft=False)
 
-# Show the plot
-plt.show() 
+fig.tight_layout(pad=2)  
+plt.show()
+fig.savefig("/home/olive/Desktop/Homo_neurons.tiff",dpi=300)
 
 
 given_stimulus=3
@@ -89,6 +90,11 @@ ax.spines[['bottom', 'left']].set_linewidth(3)
 ax.tick_params(axis='both', which='major', left=False, right=False, labelleft=False)
 ax.set_ylim(-0.1,10)
 
-# Show the plot
+fig.tight_layout(pad=2)  
 plt.show()
+fig.savefig("/home/olive/Desktop/Homo_PopTuning.tiff",dpi=300)
+
+ 
+
+
 
