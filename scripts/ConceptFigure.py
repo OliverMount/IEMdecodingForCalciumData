@@ -26,7 +26,7 @@ colors=  ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e3
 
 for idx, mean in enumerate(mean_values):
     for curve_num in range(num_curves): 
-        std_dev = np.random.uniform(40, 50) 
+        std_dev = np.random.uniform(40, 70) 
         peak_amplitude = np.random.uniform(1, 10) 
         x = mean_values 
         y = peak_amplitude * np.exp(-(x - mean)**2 / (2 * std_dev**2)) 
