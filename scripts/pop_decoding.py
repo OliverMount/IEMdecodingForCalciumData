@@ -1145,3 +1145,253 @@ if is_montage_installed():
  
 	fname='montages/Summary_PPC.png'
 	status=os.system('montage Summary_PPC_45.png  Summary_PPC_90.png  Summary_PPC_135.png -tile 3x1  -geometry +1+1 ' + fname)  
+    
+    
+    
+    
+### Plotting the dynamics for Fig. 3
+
+import os
+import sys
+import numpy as np
+import matplotlib.pyplot as plt
+#plt.style.use('_mpl-gallery')
+#plt.rcParams['_3d.rcparams']['grid.linewidth'] = 0
+from scipy.io import loadmat,savemat
+from scipy.interpolate import interp1d 
+from scipy.ndimage import gaussian_filter
+from matplotlib import cm
+
+elevation = 19  # Specify the elevation angle (in degrees)
+azimuth = -36   # Specify the azimuth angle (in degrees)
+roll=0
+
+
+def func_mat(y):
+    
+    ns,nt=y.shape
+    x=np.arange(22.5,360,45)-202.5
+    xnew=np.arange(-180,135,2)
+    
+    res=[]
+    
+    for k in range(nt):
+        func=interp1d(x,np.squeeze(y[:,k]),kind='cubic')
+        res.append(func(xnew))
+        
+    return np.stack(res,-1)
+        
+        
+
+# Local modules
+sys.path.append('/media/olive/Research/oliver/scripts/')   
+from Decoder import InvertedEncoding
+
+os.chdir('/media/olive/Research/oliver/IEMdecodingForCalciumData/pop_decoding/tuning_curves/task/V1_135/40')
+flist=os.listdir()
+
+  
+homo=[] 
+hetero=[]
+for k in flist:
+    
+    A=np.load(k)
+    B=zero_center_the_tcs(A,shift=wrap_around)
+    #C=B.transpose((0,2,1)) 
+    
+    homo.append(B[:,0,:])   # homo (all mouse)
+    hetero.append(B[:,1,:]) #hetero (all mouse)
+ 
+homo=np.mean(np.stack(homo,-1),-1)    # mean across mouse
+hetero=np.mean(np.stack(hetero,-1),-1) # mean across mouse
+
+
+homo=homo[:,10:100] 
+hetero= hetero[:,10:100]*0.6
+  
+
+angles=np.arange(22.5,360,45)-202.5 # Stimulus angles
+ns=len(angles)   # no. of stimulus values
+center_around=5  # Center the tuning curves around this angle 
+
+fs=20   
+ts=1/fs   # sampling time
+tt=np.arange(-0.5,4,ts)
+
+fig=plt.figure(figsize=(6,6))
+ax = plt.axes(projection='3d')
+ax._axis3don = False
+#fig, ax = plt.subplots(1,1,figsize=(8,5))   
+ 
+#angles1=angles[[0,4,-1]]-202.5
+#ax.set_xticks(angles[[0,4,-1]],labels=angles1.astype('int64'))
+#angles1=angles-202.5
+#ax.set_xticks(angles,labels=angles1.astype('int64'))
+x = angles
+y = tt
+X,Y= np.meshgrid(x,y)
+Z = homo 
+Z=func_mat(Z)
+xnew=np.arange(-180,135,2)
+#xnew=x
+
+yy=np.arange(-0.5,4,ts)
+X,Y=np.meshgrid(xnew,yy)
+
+#Z=gaussian_filter(Z.T, sigma=15,truncate=4)
+ 
+#Z=Z.T   
+ax.plot_surface(np.fliplr(X.T), Y.T, Z, cmap="Spectral_r",
+                linewidth=0,
+                rstride=1,
+                cstride=1,
+                edgecolors=None)  # surface plot
+
+#ax.set_xticks([-180,0,180])
+#ax.set_yticks([-0.5,0,1,2,3,4,5])
+#ax.set_zticks([0,0.2, 0.4,0.6])
+ 
+
+ax.set_xlim(-180,180)
+ax.set_ylim(-0.5,4)
+ax.set_zlim(0,0.6) 
+ax.grid(visible=False)
+ax.invert_xaxis()   # also you have to invert the data
+ax.set_xticklabels([])
+ax.set_yticklabels([])
+ax.set_zticklabels([])
+
+ 
+#ax.tick_params(axis='x', which='major', labelsize=24,pad=-2)  
+#ax.tick_params(axis='y', which='major', labelsize=24,pad=-2)  
+#ax.tick_params(axis='z', which='major', labelsize=24,pad=2)  
+
+ 
+
+tmp_planes = ax.zaxis._PLANES 
+ax.zaxis._PLANES = ( tmp_planes[1], tmp_planes[1], 
+                     tmp_planes[1], tmp_planes[1], 
+                     tmp_planes[1], tmp_planes[1])
+
+
+#ax.set_frame_on(False)
+
+ax.xaxis.pane.fill = False
+ax.yaxis.pane.fill = False
+ax.zaxis.pane.fill = False
+
+ax.xaxis.pane.set_edgecolor('w')
+ax.yaxis.pane.set_edgecolor('w')
+ax.zaxis.pane.set_edgecolor('w')
+fig.tight_layout(pad=2)  
+#ax.view_init(50, 45)
+
+ 
+#ax.set_yticks([0, 1]) 
+#ax.set_x([0, 1]) 
+#ax.tick_params(axis='both', which='major', labelsize=24,pad=1)  
+#ax.set_ylabel("Time (sec)",fontsize=16)
+#ax.set_xlabel("Offset ($\degree$)",fontsize=16)
+#ax.set_zlabel("Response (a.u)",fontsize=16)
+
+#elevation = 17  # Specify the elevation angle (in degrees)
+#azimuth = -114    # Specify the azimuth angle (in degrees)
+#elevation = 23  # Specify the elevation angle (in degrees)
+#azimuth = -59    # Specify the azimuth angle (in degrees)
+
+elevation = 24  # Specify the elevation angle (in degrees)
+azimuth = -40    # Specify the azimuth angle (in degrees)
+roll=0
+ax.view_init(elevation, azimuth,roll)
+#ax.minorticks_on()
+ax.tick_params(axis='both', length=6,width=4,direction="out")  
+
+plt.show()
+
+fig.savefig("/home/olive/Desktop/Dynamics_homo.tiff",dpi=300)
+
+
+#top=0.98,
+#bottom=0.02,
+#left=0.013,
+#right=0.987,
+#hspace=0.2,
+#wspace=0.2
+#elevation 36 aizmuth -55
+
+
+fig=plt.figure(figsize=(6,6))
+ax = plt.axes(projection='3d')
+ax._axis3don = False
+#fig, ax = plt.subplots(1,1,figsize=(8,5))   
+ 
+#angles1=angles[[0,4,-1]]-202.5
+#ax.set_xticks(angles[[0,4,-1]],labels=angles1.astype('int64'))
+#angles1=angles-202.5
+#ax.set_xticks(angles,labels=angles1.astype('int64'))
+x = angles
+y = tt
+X,Y= np.meshgrid(x,y)
+Z = hetero
+Z=func_mat(Z)
+xnew=np.arange(-180,135,2)
+yy=np.arange(-0.5,4,ts)
+X,Y=np.meshgrid(xnew,yy)
+
+#Z=gaussian_filter(Z.T, sigma=15,truncate=4)
+    
+#Z=Z.T
+ax.plot_surface(np.fliplr(X.T), Y.T, Z, cmap="Spectral_r",linewidth=0,rstride=1, cstride=1,edgecolors=None)  # surface plot
+
+ 
+ax.set_xticks([-180,0,180])
+ax.set_yticks([-0.5,0,1,2,3,4,5])
+ax.set_zticks([0,0.2, 0.4,0.6])
+ax.set_xlim(-180,180)
+ax.set_ylim(-0.5,4)
+ax.set_zlim(0,0.6) 
+ax.grid(visible=False)
+ax.invert_xaxis()   # also you have to invert the data
+ax.set_xticklabels([])
+ax.set_yticklabels([])
+ax.set_zticklabels([]) 
+
+tmp_planes = ax.zaxis._PLANES   # what is this temp_planes?
+ax.zaxis._PLANES = ( tmp_planes[1], tmp_planes[1], 
+                     tmp_planes[1], tmp_planes[1], 
+                     tmp_planes[1], tmp_planes[1])
+
+ax.xaxis.pane.fill = False
+ax.yaxis.pane.fill = False
+ax.zaxis.pane.fill = False
+
+ax.xaxis.pane.set_edgecolor('w')
+ax.yaxis.pane.set_edgecolor('w')
+ax.zaxis.pane.set_edgecolor('w')
+ 
+#ax.view_init(50, 45)
+fig.tight_layout(pad=2)  
+
+ax.set_xticklabels([])
+ax.set_yticklabels([])
+ax.set_zticklabels([])
+#ax.tick_params(axis='x', which='major', labelsize=24,pad=-2)  
+#ax.tick_params(axis='y', which='major', labelsize=24,pad=-2)  
+#ax.tick_params(axis='z', which='major', labelsize=24,pad=2) 
+ 
+#ax.set_ylabel("Time (sec)",fontsize=24)
+#ax.set_xlabel("Offset ($\degree$)",fontsize=24)
+#ax.set_zlabel("Response (a.u)",fontsize=24)
+
+#elevation = 17  # Specify the elevation angle (in degrees)
+#azimuth = -114    # Specify the azimuth angle (in degrees)
+
+#elevation = 23  # Specify the elevation angle (in degrees)
+#azimuth = -59    # Specify the azimuth angle (in degrees)
+
+ax.view_init(elevation, azimuth,roll)
+plt.show()
+
+fig.savefig("/home/olive/Desktop/Dynamics_hetero.tiff",dpi=300)
+
+os.chdir('/media/olive/Research/oliver/scripts/') 
