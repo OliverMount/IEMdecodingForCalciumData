@@ -1410,16 +1410,24 @@ import matplotlib.pyplot as plt
 
 # Mean values
 mean_values = np.arange(22.5, 360, 45)
-
+num_points=len(mean_values)
 # Number of neruons per stimulus
 num_curves = 2 
 
+# Initialize an array to store Gaussian curves
+gaussian_curves = np.zeros((num_points, num_points * num_curves))
+
+
+
 fig, ax = plt.subplots(1, figsize=(17, 5))
 
+
 # Generate and plot Gaussian curves
-colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'orange']
+#colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'orange']
+colors=  ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#17becf']
+
 for idx, mean in enumerate(mean_values):
-    for _ in range(num_curves):
+    for curve_num in range(num_curves):
         # Randomly choose standard deviation in the range (10, 20)
         std_dev = np.random.uniform(40, 50)
 
@@ -1431,9 +1439,12 @@ for idx, mean in enumerate(mean_values):
 
         # Generate Gaussian curve
         y = peak_amplitude * np.exp(-(x - mean)**2 / (2 * std_dev**2))
+        
+        # Store the Gaussian curve in the array
+        gaussian_curves[:, idx * num_curves + curve_num] = y
 
         # Plot only the data points at the mean with a smaller and unfilled marker
-        ax.scatter(x, y, color=colors[idx], marker='o', facecolors='none', s=25)
+        ax.scatter(x, y, color=colors[idx], marker='o', s=25)
 
         # Plot the entire curve
         ax.plot(x, y, color=colors[idx], alpha=0.8,lw=3)
@@ -1456,70 +1467,29 @@ ax.spines[['bottom', 'left']].set_linewidth(3)
 ax.tick_params(axis='both', which='major', left=False, right=False, labelleft=False)
 
 # Show the plot
-plt.show()
+plt.show() 
 
 
+given_stimulus=3
+row_to_plot = gaussian_curves[given_stimulus]   
+averaged_row = np.mean(row_to_plot.reshape(-1, 2), axis=1)
+reshaped_values = values.reshape(-1, 2)
+flattened_values = reshaped_values.flatten()
 
+x_positions = np.arange(0, 8)
 
-
-
-
-
-
-
-
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Set a seed for reproducibility
-#np.random.seed(42)
-
-# Mean values
-mean_values = np.arange(22.5, 360, 45)
-
-# Number of curves for each mean value
-num_curves = 2
-
-
-fig,ax=plt.subplots(1,figsize=(15,7))
-# Generate and plot Gaussian curves
-colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'orange']
-for idx, mean in enumerate(mean_values):
-    for _ in range(num_curves):
-        # Randomly choose standard deviation in the range (10, 20)
-        std_dev = np.random.uniform(40, 50)
-        
-        # Randomly choose peak amplitude in the range (1, 5)
-        peak_amplitude = np.random.uniform(1, 10)
-        
-        # Generate x values centered around the mean
-        x = np.linspace(mean - 5 * std_dev, mean + 5 * std_dev, 100)
-        
-        # Generate Gaussian curve
-        y = peak_amplitude * np.exp(-(x - mean)**2 / (2 * std_dev**2))
-        
-        # Plot the Gaussian curve with a distinct color for each mean
-        ax.plot(x, y, label=f'Mean: {mean}', color=colors[idx])
-
-# Add vertical lines to mark mean values
-for mean in mean_values:
-    ax.axvline(x=mean, color='gray', linestyle='--', alpha=0.5)
-
-# Set x-axis ticks to show mean values
-#ax.set_xticks(mean_values)
+# Plot the scatter plot
+for k in range(len(x_positions)):
+	plt.scatter(np.repeat(x_positions[k], 2), flattened_values[2*k:2*k+2], color=colors[k], marker='o')
+plt.plot(averaged_row, color='grey', linestyle='-', linewidth=2,marker='o')
 
 # Set labels and title
-#ax.set_xlabel('Mean motion direction')
-#ax.set_ylabel('Tuning curve amplitude (a.u)') 
-ax.spines[['top','right']].set_visible(False) 
-ax.spines[['bottom','left']].set_linewidth(3) 
-#plt.tick_params(axis='x', which='major', labelsize=18,left=False, right=False, labelleft=False) 
-plt.tick_params(axis='both', which='major', left=False, right=False, labelleft=False)
+plt.xlabel('X-axis')
+plt.ylabel('Values')
+plt.title('Scatter Plot with Two Values at Each X-axis Position')
 
+# Add a legend
+plt.legend()
 
 # Show the plot
 plt.show()
-
-
-
-
