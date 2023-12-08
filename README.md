@@ -4,9 +4,6 @@ The Inverted Encoding Model (IEM) is a neuroimaging analysis approach applied tr
 
 IEM can be described mathematically via four linear equations. For more details about the IEM please refer to  Myers et al. [^1].
 
-![Equation](https://latex.codecogs.com/png.latex?\int_0^\infty%20e^{-x^2}%20dx%20=%20\frac{\sqrt{\pi}}{2})
-
-
 [^1]: Nicholas E MyersGustavo RohenkohlValentin WyartMark W WoolrichAnna C NobreMark G Stokes (2015) Testing sensory evidence against mnemonic templates eLife 4:e09000.
 
 1. Training data model: 
@@ -29,8 +26,9 @@ This repository contains the python class `InvertedEncoding` (in the scripts/uti
 1. git clone the repository to a local folder in your computer
 
 2. cd in to the scripts folder and set the following paths in the  decoding.py
-	a. data_path: This is the path where the preprocessed calcium data are stored
-	b. pval_path: pvalues of the tuned and untuned neurons are stored here
+
+	a. `data_path`: This is the path where the preprocessed calcium data are stored
+	b. `pval_path`: pvalues of the tuned and untuned neurons are stored here
 
 	The two levels of the data directory will look like this
 
