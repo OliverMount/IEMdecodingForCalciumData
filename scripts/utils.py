@@ -14,6 +14,9 @@ from scipy.io import loadmat,savemat
 from scipy.ndimage import gaussian_filter1d
 from scipy.stats import zscore 
 
+import matplotlib.pyplot as plt
+
+
 angles=np.arange(22.5,360,45) # Stimulus angles 
 center_around=5  # Center the tuning curves around this angle 
 ns=len(angles)
