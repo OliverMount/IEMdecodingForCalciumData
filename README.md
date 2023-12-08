@@ -9,11 +9,17 @@ IEM can be described mathematically via four linear equations. For more details 
 
 [^1]: Nicholas E MyersGustavo RohenkohlValentin WyartMark W WoolrichAnna C NobreMark G Stokes (2015) Testing sensory evidence against mnemonic templates eLife 4:e09000.
 
-1. ![Equation](https://latex.codecogs.com/svg.image?%20X=WC%20)
-2. ![Equation](https://latex.codecogs.com/svg.image?%5Cwidehat%7BW%7D=XC%5ET(CC%5ET)%5E%7B-1%7D)
-3. ![Equation](https://latex.codecogs.com/svg.image?Y=%5Cwidehat%7BW%7DC_%7B%5Ctext%7Btest%7D%7D)
-4. ![Equation](https://latex.codecogs.com/svg.image?%20C_%7B%5Ctext%7Btest%7D%7D=(%5Cwidehat%7BW%7D%5ET%5Cwidehat%7BW%7D)%5E%7B-1%7D%5Cwidehat%7BW%7D%5E%7BT%7DY)
+1. Training data model: 
+![Equation](https://latex.codecogs.com/svg.image?%20X=WC%20)
 
+2. Weight estimate based on trianing data
+![Equation](https://latex.codecogs.com/svg.image?%5Cwidehat%7BW%7D=XC%5ET(CC%5ET)%5E%7B-1%7D)
+
+3. Test data model:
+![Equation](https://latex.codecogs.com/svg.image?Y=%5Cwidehat%7BW%7DC_%7B%5Ctext%7Btest%7D%7D)
+
+4. Estimated tuning curve of the test data:
+![Equation](https://latex.codecogs.com/svg.image?%20C_%7B%5Ctext%7Btest%7D%7D=(%5Cwidehat%7BW%7D%5ET%5Cwidehat%7BW%7D)%5E%7B-1%7D%5Cwidehat%7BW%7D%5E%7BT%7DY)
 
 
 This repository contains the python class `InvertedEncoding` (in the scripts/utils.py) that implements the IEM. We employed IEM via for extracting motion direction from the preprocessed calcium imaging of mouse V1 and PPC data via parallel processing the time points.
