@@ -9,6 +9,11 @@ The Inverted Encoding Model (IEM) is a neuroimaging analysis approach applied tr
 
 IEM can be described mathematically via four linear equations. For more details about the IEM please refer to  Myers et al. [^1].
 
+$$
+1. E= mc^2
+$$
+
+
 [^1]: Nicholas E MyersGustavo RohenkohlValentin WyartMark W WoolrichAnna C NobreMark G Stokes (2015) Testing sensory evidence against mnemonic templates eLife 4:e09000.
 
 
