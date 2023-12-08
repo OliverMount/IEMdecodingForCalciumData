@@ -28,8 +28,7 @@ for (roi in rois){
       colnames(temp)<-c("Homo","Hetero")
       temp$Condition<- rep(roi,nrow(temp))
       temp$Percent<-rep(percent,nrow(temp))
-      df<- rbind(df,temp)  
-       
+      df<- rbind(df,temp)   
   } 
 }
 
@@ -56,14 +55,7 @@ p <- ggplot(mean_data_task, aes(x = Percent, y = mean_value, group=variable, col
   geom_point()+
   geom_errorbar(aes(ymin=mean_value-se_value, ymax=mean_value+se_value), width=.2,
                 position=position_dodge(0.05))+
-  #geom_point(data=mean_data,aes(x=variable,y=mean_value,fill = Percent))+
-  #geom_boxplot(position = "dodge", outlier.color = "red", outlier.shape = NA) +
-  #stat_summary(fun = mean, geom = 'point', shape = 23, size = 3,
-  #             color = "black", fill = "magenta", alpha = 0.7, position = position_dodge(width = 0.75)) +
-  #geom_pointrange(data = mean_data, aes(x = variable, y = mean_value, ymin = mean_value - se_value, ymax = mean_value + se_value))+
-  #geom_point(data = mean_data, aes(x = variable, y = mean_value, ymin = mean_value - se_value, ymax = mean_value + se_value),
-  #              position = position_dodge(width = 0.75), width = 0.2, color = "black") +
-  theme_classic() +
+     theme_classic() +
   theme(legend.position = "top",
         axis.ticks.length.x = unit(3, 'mm'),
         axis.ticks.length.y = unit(3, 'mm'),
@@ -83,8 +75,7 @@ p <- ggplot(mean_data_task, aes(x = Percent, y = mean_value, group=variable, col
 # Print the plot
 print(p)
 
-### mean_data making for passive
-
+### mean_data making for passive 
 setwd('/media/olive/Research/oliver/pop_slopes/passive/')
 flist<-list.files(getwd())
 
@@ -141,14 +132,7 @@ p <- ggplot(final, aes(x = Percent, y = mean_value,
   geom_point()+
   geom_errorbar(aes(ymin=mean_value-se_value, ymax=mean_value+se_value), width=.2,
                 position=position_dodge(0.05))+
-  #geom_point(data=mean_data,aes(x=variable,y=mean_value,fill = Percent))+
-  #geom_boxplot(position = "dodge", outlier.color = "red", outlier.shape = NA) +
-  #stat_summary(fun = mean, geom = 'point', shape = 23, size = 3,
-  #             color = "black", fill = "magenta", alpha = 0.7, position = position_dodge(width = 0.75)) +
-  #geom_pointrange(data = mean_data, aes(x = variable, y = mean_value, ymin = mean_value - se_value, ymax = mean_value + se_value))+
-  #geom_point(data = mean_data, aes(x = variable, y = mean_value, ymin = mean_value - se_value, ymax = mean_value + se_value),
-  #              position = position_dodge(width = 0.75), width = 0.2, color = "black") +
-  theme_classic() +
+     theme_classic() +
   theme(legend.position = "top",
         axis.ticks.length.x = unit(3, 'mm'),
         axis.ticks.length.y = unit(3, 'mm'),
