@@ -1,8 +1,3 @@
-<script type="text/javascript" async
-  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
-</script>
-
-
 # IEM decoding For Calcium Data
 
 The Inverted Encoding Model (IEM) is a neuroimaging analysis approach applied traditionally to functional Magnetic Resonance Imaging (fMRI), Electroencephalography (EEG) data. It involves decoding sensory information from brain activity patterns, working in the opposite direction of traditional encoding models. Instead of predicting brain activity given external stimuli (as in encoding models), IEM aims to reconstruct and decode features or representations of stimuli from observed neural patterns. This technique is particularly useful for investigating the neural representation of sensory information and understanding how different brain regions contribute to encoding sensory features.
@@ -10,7 +5,9 @@ The Inverted Encoding Model (IEM) is a neuroimaging analysis approach applied tr
 IEM can be described mathematically via four linear equations. For more details about the IEM please refer to  Myers et al. [^1].
 
 $$
+
 1. E= mc^2
+
 $$
 
 
