@@ -27,7 +27,8 @@ This repository contains the python class `InvertedEncoding` (in the scripts/uti
 
 2. cd in to the scripts folder and set the following paths in the  decoding.py
 
-	a. `data_path`: This is the path where the preprocessed calcium data are stored
+	a. `data_path`: This is the path where the preprocessed calcium data are storedi
+
 	b. `pval_path`: pvalues of the tuned and untuned neurons are stored here
 
 	The two levels of the data directory will look like this
