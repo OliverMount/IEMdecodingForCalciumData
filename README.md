@@ -2,7 +2,7 @@
 
 The Inverted Encoding Model (IEM) is a neuroimaging analysis approach applied traditionally to functional Magnetic Resonance Imaging (fMRI), Electroencephalography (EEG) data. It involves decoding sensory information from brain activity patterns, working in the opposite direction of traditional encoding models. Instead of predicting brain activity given external stimuli (as in encoding models), IEM aims to reconstruct and decode features or representations of stimuli from observed neural patterns. This technique is particularly useful for investigating the neural representation of sensory information and understanding how different brain regions contribute to encoding sensory features.
 
-IEM can be described mathematically via four linear equations. For more details about the IEM please refer to  Myers et al. [^1].
+IEM can be described mathematically by four linear equations. For more details about the IEM, please refer to Myers et al. [^1].
 
 [^1]: Nicholas E MyersGustavo RohenkohlValentin WyartMark W WoolrichAnna C NobreMark G Stokes (2015) Testing sensory evidence against mnemonic templates eLife 4:e09000.
 
@@ -19,19 +19,19 @@ IEM can be described mathematically via four linear equations. For more details 
 ![Equation](https://latex.codecogs.com/svg.image?%20C_%7B%5Ctext%7Btest%7D%7D=(%5Cwidehat%7BW%7D%5ET%5Cwidehat%7BW%7D)%5E%7B-1%7D%5Cwidehat%7BW%7D%5E%7BT%7DY)
 
 
-This repository contains the python class `InvertedEncoding` (in the scripts/utils.py) that implements the IEM. We employed IEM via for extracting motion direction from the preprocessed calcium imaging of mouse V1 and PPC data via parallel processing the time points.
+This repository contains the Python class `InvertedEncoding` (in the scripts/utils.py file) that implements the IEM. We employed the IEM for extracting motion direction from the preprocessed calcium imaging of mouse V1 and PPC data through parallel processing of the time points. A brief demo of how to create an instance of the model is provided in `develop/IEMdemo.ipynb`.
 
 ### Instruction for running the code
 
 1. git clone the repository to a local folder in your computer
 
-2. cd in to the scripts folder and set the following paths in the  decoding.py
+2. Navigate to the 'scripts' folder and set the following paths in the 'decoding.py' file:
 
-	a. `data_path`: This is the path where the preprocessed calcium data are storedi
+	a. `data_path`: This is the path where the preprocessed calcium data is stored.
 
-	b. `pval_path`: pvalues of the tuned and untuned neurons are stored here
+	b. `pval_path`: P-values of the tuned and untuned neurons are stored here.
 
-	The two levels of the data directory will look like this
+	The directory structure at two levels of the data folder will look like this:
 
 	```
 
@@ -58,7 +58,8 @@ This repository contains the python class `InvertedEncoding` (in the scripts/uti
 	    └── V1_90
 
 	```
-3. Run the scripts.py it would create a decoding folder (this is the results folder) in the level as of the scripts folder. The structure  of the decoding folder would be the following
+3. Run the `scripts.py` file; it will create a `decoding` folder (results folder) at the same level as the `scripts` folder. The structure of the 'decoding' folder will be as follows:
+
 
 ```
 .
@@ -77,4 +78,4 @@ This repository contains the python class `InvertedEncoding` (in the scripts/uti
     └── task
 ```
 
-Note: Individual figures for each condition is stored inside the plots directory. Montage folder (that cotains sewed figure files) will be recrated only if the platform is Lixux (if montage is installed). 
+Note: Individual figures for each condition are stored inside the 'plots' directory. The 'Montage' folder (containing sewed figure files) will be recreated only if the platform is Linux (if 'montage' is installed). 
