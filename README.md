@@ -9,9 +9,10 @@ IEM can be described mathematically via four linear equations. For more details 
 
 [^1]: Nicholas E MyersGustavo RohenkohlValentin WyartMark W WoolrichAnna C NobreMark G Stokes (2015) Testing sensory evidence against mnemonic templates eLife 4:e09000.
 
-
-
-
+1. ![Equation](https://latex.codecogs.com/svg.image?%20X=WC%20)
+2. ![Equation](https://latex.codecogs.com/svg.image?%5Cwidehat%7BW%7D=XC%5ET(CC%5ET)%5E%7B-1%7D)
+3. ![Equation](https://latex.codecogs.com/svg.image?%20X=WC%20)
+4. ![Equation](https://latex.codecogs.com/svg.image?%20X=WC%20)
 
 
 
