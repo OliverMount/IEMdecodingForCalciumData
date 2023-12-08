@@ -2,6 +2,20 @@
 
 The Inverted Encoding Model (IEM) is a neuroimaging analysis approach applied traditionally to functional Magnetic Resonance Imaging (fMRI), Electroencephalography (EEG) data. It involves decoding sensory information from brain activity patterns, working in the opposite direction of traditional encoding models. Instead of predicting brain activity given external stimuli (as in encoding models), IEM aims to reconstruct and decode features or representations of stimuli from observed neural patterns. This technique is particularly useful for investigating the neural representation of sensory information and understanding how different brain regions contribute to encoding sensory features.
 
+IEM can be described mathematically via four linear equations. For more details about the IEM please refer to  Myers et al. [^1].
+
+[^1]: Nicholas E MyersGustavo RohenkohlValentin WyartMark W WoolrichAnna C NobreMark G Stokes (2015) Testing sensory evidence against mnemonic templates eLife 4:e09000.
+
+
+
+
+
+
+
+
+
+
+
 This repository contains the python class `InvertedEncoding` that implements the IEM. We show the parallel implementaion of the IEM for extracting motion direction from the preprocessed calcium imaging of mouse V1 and PPC data.
 
 ### Instruction for running the code
