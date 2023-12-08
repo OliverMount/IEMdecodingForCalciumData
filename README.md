@@ -11,11 +11,8 @@ IEM can be described mathematically via four linear equations. For more details 
 
 1. ![Equation](https://latex.codecogs.com/svg.image?%20X=WC%20)
 2. ![Equation](https://latex.codecogs.com/svg.image?%5Cwidehat%7BW%7D=XC%5ET(CC%5ET)%5E%7B-1%7D)
-3. ![Equation](https://latex.codecogs.com/svg.image?%20X=WC%20)
-4. ![Equation](https://latex.codecogs.com/svg.image?%20X=WC%20)
-
-
-
+3. ![Equation](https://latex.codecogs.com/svg.image?Y=%5Cwidehat%7BW%7DC_%7B%5Ctext%7Btest%7D%7D)
+4. ![Equation](https://latex.codecogs.com/svg.image?%20C_%7B%5Ctext%7Btest%7D%7D=(%5Cwidehat%7BW%7D%5ET%5Cwidehat%7BW%7D)%5E%7B-1%7D%5Cwidehat%7BW%7D%5E%7BT%7DY)
 
 
 
