@@ -132,8 +132,6 @@ class InvertedEncoding:
 		self.params['ref']=ref
 		self.params['nos']=s.shape[0]
 	
-		#print(self.params) 
-		
 
 	def get_params(self):
 		"""
@@ -213,10 +211,6 @@ class InvertedEncoding:
 		-----
 		Supports numpy array
 		""" 
-
-		# Check that X and y have correct shape 
-		#X, y = check_X_y(X.T, y)
-		#print(type(y)) 
 		
 		self.sys_type=sys_type
 		
@@ -227,19 +221,17 @@ class InvertedEncoding:
 		# Weight estimator
 		if self.sys_type=="under":
 			self.esti_w=np.matmul(X,np.linalg.pinv(self.C1))
-			#print("Min. Weight:", np.min(self.esti_w),"Max. Weight:", np.min(self.esti_w))
-			#fitted values 
+			
 			self.fitted_values=np.matmul(self.esti_w,self.C1)
-			# residuals of the fit
+			
 			self.fit_residuals=X-self.fitted_values
 		elif self.sys_type=="over":
 			X=X.T
 			self.C1=self.C1.T
 			self.esti_w=np.matmul(np.linalg.pinv(self.C1),X)
 			
-			#fitted values 
 			self.fitted_values=np.matmul(self.C1,self.esti_w)
-			# residuals of the fit
+			
 			self.fit_residuals=X-self.fitted_values
 		else:
 			raise NotImplementedError(self.sys_type + ' not implemented yet') 
@@ -249,29 +241,20 @@ class InvertedEncoding:
 		
 		# Check if model is fitted first
 		check_is_fitted(self,["esti_w"]) 
-		#if check_is_fitted(self,["esti_w"]) is None:	   
-		#	print('++ Model is fitted already. Predicting the labels for test data') 
 		
 		if self.sys_type=="under":  # if underdetermined solver is desired 
 			s=X.shape
 			if len(s) ==1 or len(s)==2:  # 1D or 2D test data
 				self.predicted_values = np.matmul(np.linalg.pinv(self.esti_w),X)
-				#self.predict_residuals = X-np.matmul(self.esti_w,self.predicted_values) 
 			elif len(s)==3:		   # 3D test data; rep 2d testing along third axis
-				#pred=np.zeros((self.params['nos'],s[1],s[2]))
-				#for k in len(s[2]):
-				#	pred[:,:,k] =np.matmul(np.linalg.pinv(self.esti_w),X[:,:,k])
-				#self.predicted_values = pred
 				invW= np.linalg.pinv(self.esti_w)  # compute inverse only once
 				self.predicted_values =np.stack([np.matmul(invW,X[:,:,k]) for k in range(s[2])],-1)
-				#del pred # Allocated different memory 
 			else:
 				raise NotImplementedError('++ Underdetermined solver not implemented yet for more than 3D test data sets') 
 				
 		elif self.sys_type=="over": # if over-determined solver is desired
 			self.esti_w=self.esti_w.T 
 			self.predicted_values = np.matmul(np.linalg.pinv(self.esti_w),X)
-			#self.predict_residuals = X-np.matmul(self.esti_w,self.predicted_values) 
 		else:
 			raise NotImplementedError(self.sys_type + ' not implemented yet')
 
@@ -359,8 +342,6 @@ def process_time_step(Xtra,Xte,ytra,yte):
 	ypred=roll_all(predicted,yte,center_around)
 	ypred=np.mean(ypred,1) # mean across trials of zero-centered) tuning curvesv (hetero case)   
 	
-	#print(cv_res_final.shape)
-	#print(ypred[:,np.newaxis].shape) 
 	res=np.concatenate((cv_res_final,ypred[:,np.newaxis]),axis=-1)  
 	return res 
  
