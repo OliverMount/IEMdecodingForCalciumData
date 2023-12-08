@@ -1,3 +1,8 @@
+<script type="text/javascript" async
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
 # IEM decoding For Calcium Data
 
 The Inverted Encoding Model (IEM) is a neuroimaging analysis approach applied traditionally to functional Magnetic Resonance Imaging (fMRI), Electroencephalography (EEG) data. It involves decoding sensory information from brain activity patterns, working in the opposite direction of traditional encoding models. Instead of predicting brain activity given external stimuli (as in encoding models), IEM aims to reconstruct and decode features or representations of stimuli from observed neural patterns. This technique is particularly useful for investigating the neural representation of sensory information and understanding how different brain regions contribute to encoding sensory features.
@@ -15,8 +20,7 @@ IEM can be described mathematically via four linear equations. For more details 
 
 
 
-
-This repository contains the python class `InvertedEncoding` that implements the IEM. We show the parallel implementaion of the IEM for extracting motion direction from the preprocessed calcium imaging of mouse V1 and PPC data.
+This repository contains the python class `InvertedEncoding` (in the scripts/utils.py) that implements the IEM. We employed IEM via for extracting motion direction from the preprocessed calcium imaging of mouse V1 and PPC data via parallel processing the time points.
 
 ### Instruction for running the code
 
